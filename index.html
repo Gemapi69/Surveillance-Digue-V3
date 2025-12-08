@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surveillance Digue</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Surveillance Digue">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .container {
+            padding: 20px;
+            max-width: 100%;
+        }
+        
+        .section {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .btn {
+            display: block;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, #74b9ff, #0984e3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(45deg, #00b894, #00cec9);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(45deg, #fdcb6e, #e17055);
+        }
+        
+        .emergency-button {
+            background: linear-gradient(45deg, #e74c3c, #c0392b) !important;
+            color: white;
+            border: 3px solid #fff;
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
+            font-weight: bold;
+            font-size: 16px;
+            text-transform: uppercase;
+            animation: pulse-red 2s infinite;
+        }
+        
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 20px rgba(231, 76, 60, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(231, 76, 60, 0.8); }
+            100% { box-shadow: 0 0 20px rgba(231, 76, 60, 0.5); }
+        }
+
+        .status-bar {
+            background: rgba(0,0,0,0.05);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .water-level {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .current-level {
+            font-size: 48px;
+            font-weight: bold;
+            color: #1976d2;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .alert-high {
+            color: #c62828 !important;
+            animation: blink 1s infinite;
+        }
+
+        .alert-seuil1 { color: #7B1FA2 !important; }
+        .alert-seuil1bis { color: #F57F17 !important; }
+        .alert-seuil2 { color: #F57F17 !important; }
+        .alert-seuil3 { color: #FF9800 !important; }
+        .alert-seuil4 { color: #D32F2F !important; animation: blink 1s infinite; }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.5; }
+        }
+
+        .alert-box {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: bold;
+            text-align: center;
+            border: 2px solid;
+        }
+
+        .alert-box.seuil1 {
+            background: #F3E5F5;
+            color: #7B1FA2;
+            border-color: #7B1FA2;
+        }
+
+        .alert-box.seuil1bis {
+            background: #FFFDE7;
+            color: #F57F17;
+            border-color: #F57F17;
+        }
+
+        .alert-box.seuil2 {
+            background: #FFFDE7;
+            color: #F57F17;
+            border-color: #F57F17;
+        }
+
+        .alert-box.seuil3 {
+            background: #FFF3E0;
+            color: #FF9800;
+            border-color: #FF9800;
+        }
+
+        .alert-box.seuil4 {
+            background: #FFEBEE;
+            color: #D32F2F;
+            border-color: #D32F2F;
+            animation: pulse-alert 2s infinite;
+        }
+
+        @keyframes pulse-alert {
+            0% { background: #FFEBEE; }
+            50% { background: #FFCDD2; }
+            100% { background: #FFEBEE; }
+        }
+
+        .info-box {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .chart-canvas {
+            width: 100%;
+            max-width: 800px;
+            height: 300px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin: 20px 0;
+            cursor: crosshair;
+        }
+
+        .chart-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .load-btn {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+
+        .thresholds-legend {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .threshold-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .threshold-color {
+            width: 20px;
+            height: 3px;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+        
+        @media (max-width: 480px) {
+            .container { padding: 10px; }
+            .section { padding: 15px; }
+            .current-level { font-size: 36px; }
+            .chart-canvas { height: 250px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚨 Surveillance Digue</h1>
+    </div>
+    
+    <div class="container">
+        <div class="status-bar">
+            📅 <script>document.write(new Date().toLocaleString('fr-FR'));</script> | 📍 Lyon - Région Auvergne-Rhône-Alpes
+        </div>
+        
+        <!-- 1. Monitoring Station V300002001 -->
+        <div class="section">
+            <h2>📊 Station Pont Morand Lyon - Monitoring 24h</h2>
+            
+            <div class="water-level">
+                <div style="text-align: center;">
+                    <h3>💧 Hauteur d'eau actuelle</h3>
+                    <div id="waterDisplay">
+                        <div class="current-level" id="currentLevel">--</div>
+                        <div id="lastUpdate" style="color: #666; font-size: 14px;">Chargement...</div>
+                    </div>
+                </div>
+                
+                <div id="alertZone" style="display: none;"></div>
+                <div id="infoZone" style="display: none;"></div>
+                
+                <!-- Légende des seuils -->
+                <div class="thresholds-legend">
+                    <h4 style="margin-bottom: 10px;">📏 Seuils de surveillance</h4>
+                    <div class="threshold-item">
+                        <div class="threshold-color" style="background: #7B1FA2;"></div>
+                        <span>Seuil de vigilance 1: 160 cm (1.60m)</span>
+                    </div>
+                    <div class="threshold-item">
+                        <div class="threshold-color" style="background: #F57F17;"></div>
+                        <span>Seuil de vigilance 1bis: 280 cm (2.80m)</span>
+                    </div>
+                    <div class="threshold-item">
+                        <div class="threshold-color" style="background: #F57F17;"></div>
+                        <span>Seuil de vigilance 2: 360 cm (3.60m)</span>
+                    </div>
+                    <div class="threshold-item">
+                        <div class="threshold-color" style="background: #FF9800;"></div>
+                        <span>Seuil de vigilance 3 (niveau de protection): 460 cm (4.60m)</span>
+                    </div>
+                    <div class="threshold-item">
+                        <div class="threshold-color" style="background: #D32F2F;"></div>
+                        <span>Seuil de vigilance 4 (niveau de danger): 480 cm (4.80m)</span>
+                    </div>
+                </div>
+                
+                <!-- Graphique Canvas -->
+                <div style="text-align: center;">
+                    <canvas id="waterChart" class="chart-canvas" width="800" height="300"></canvas>
+                    <div id="chartInfo" class="chart-info" style="display: none;">
+                        <div id="clickInfo">Cliquez sur le graphique pour voir les détails d'un point</div>
+                        <div id="chartStats" style="margin-top: 10px; font-size: 14px; color: #666;"></div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="load-btn" onclick="loadWaterData()">
+                        🔄 Actualiser les données
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Liens externes -->
+            <a href="https://www.vigicrues.gouv.fr/station/V300002001" class="btn btn-warning" target="_blank">
+                🌊 Site Vigicrues Officiel
+            </a>
+            
+            <a href="https://superviseur.paratronic.com/" target="_blank" class="btn btn-warning">
+                🔧 Superviseur Paratronic (gemapilyon/lyon)
+            </a>
+        </div>
+        
+        <!-- 2. Itinéraires -->
+        <div class="section">
+            <h2>🗺️ Itinéraires Préétablis</h2>
+            <a href="https://www.google.com/maps/d/viewer?mid=1-HlcsxboWarOxhJ06qMahMBkjDOMQDU" class="btn" target="_blank">
+                📍 Itinéraire 1: Triangle → Eaux bleues
+            </a>
+            <a href="https://www.google.com/maps/d/viewer?mid=1vVaezJW-9mFF5b4oteyc-xA69HaNTHM" class="btn" target="_blank">
+                📍 Itinéraire 2: Eaux bleues → Digue Duclos
+            </a>
+            <a href="https://www.google.com/maps/d/viewer?mid=1lDayOhXeVxTh-VxOJkH0bhYP65nFw3U" class="btn" target="_blank">
+                📍 Itinéraire 3: Digue Duclos → Digue St Jean
+            </a>
+            <a href="https://www.google.com/maps/d/viewer?mid=1oVA1hEX2waeiYvpmzox1DCLW_MhcsrQ" class="btn" target="_blank">
+                📍 Itinéraire 4: Annexe 4 - Circuit C
+            </a>
+            <a href="https://www.google.com/maps/d/viewer?mid=1n2Wswd2v5GUN66pp6kQVPsnrphtpfu0" class="btn" target="_blank">
+                📍 Itinéraire 5: Annexe 5 - Circuit D
+            </a>
+        </div>
+        
+        <!-- 3. Formulaires -->
+        <div class="section">
+            <h2>📋 Formulaires de Visite</h2>
+            <a href="https://docs.google.com/spreadsheets/d/1wV50ZsyoDJhcf5Lja5rl1S9TxsOauadMHmyo9slFQGs/edit?gid=0#gid=0" class="btn btn-secondary" target="_blank">
+                💧 Formulaire "Visite des Eaux Bleues"
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1Tsigd9S-qpZfZDQUeLgkA7RIWOTEeDww-NVUIempBMU/edit?gid=0#gid=0" class="btn btn-secondary" target="_blank">
+                🏗️ Formulaire "Visite Digue Duclos"
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1kBdOQFZrZ260ah69D6JFvHmQXbumgkTNcgMYXsYQoZs/edit?gid=0#gid=0" class="btn btn-secondary" target="_blank">
+                ⛪ Formulaire "Visite Digue St Jean"
+            </a>
+        </div>
+        
+        <!-- 4. Déclaration désordre -->
+        <div class="section">
+            <h2>🚨 Déclaration désordre</h2>
+            
+            <button class="btn emergency-button" style="width: 100%; padding: 20px;" onclick="declareIncident()">
+                🚨 Déclaration Désordre 🚨
+            </button>
+            
+            <a href="https://docs.google.com/document/d/1noVZoJXTRZhPxUgIgMmXy1exlvEX4D_l1iKgFVYniVs/edit?usp=sharing" class="btn btn-warning" target="_blank">
+                📝 Modification de la déclaration d'incidents
+            </a>
+        </div>
+        
+        <!-- 5. Documents -->
+        <div class="section">
+            <h2>📚 Documents & Planning</h2>
+            <a href="https://drive.google.com/drive/folders/1deKB9iZ3gYfjndRiJY3Dyod8UQw3kzTA" class="btn btn-success" target="_blank">
+                📄 Documents d'Astreinte
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1DHt0dOl-bFUE5TxNsH33UVqwarC1mSEv/edit?usp=drive_link&ouid=117931034611088760506&rtpof=true&sd=true" target="_blank">
+                📅 Planning d'Astreinte
+            </a>
+        </div>
+    </div>
+
+    <!-- Script principal -->
+    <script>
+        var chartData = [];
+        
+        // Définition des 5 seuils avec leurs couleurs
+        var thresholds = [
+            { level: 1.60, color: '#7B1FA2', name: 'Seuil 1', description: 'Surveillance renforcée' },
+            { level: 2.80, color: '#F57F17', name: 'Seuil 1bis', description: 'Pré-alerte' },
+            { level: 3.60, color: '#F57F17', name: 'Seuil 2', description: 'Vigilance' },
+            { level: 4.60, color: '#FF9800', name: 'Seuil 3', description: 'Alerte' },
+            { level: 4.80, color: '#D32F2F', name: 'Seuil 4', description: 'Alerte critique' }
+        ];
+        
+        var canvas, ctx;
+        
+        function declareIncident() {
+            var now = new Date();
+            var incidentId = 'INC_' + now.getTime();
+            var incidentDate = now.toLocaleDateString('fr-FR');
+            var incidentTime = now.toLocaleTimeString('fr-FR');
+            
+            console.log('🚨 Déclaration incident:', incidentId);
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        var gpsCoords = position.coords.latitude.toFixed(6) + ', ' + position.coords.longitude.toFixed(6);
+                        generateIncidentReport(incidentId, incidentDate, incidentTime, gpsCoords);
+                    },
+                    function(error) {
+                        console.log('Erreur GPS:', error);
+                        generateIncidentReport(incidentId, incidentDate, incidentTime, 'GPS non disponible');
+                    }
+                );
+            } else {
+                generateIncidentReport(incidentId, incidentDate, incidentTime, 'GPS non supporté');
+            }
+        }
+        
+        function generateIncidentReport(id, date, time, gps) {
+            var rapport = '🚨 RAPPORT D\'INCIDENT - PATROUILLE DES DIGUES\n';
+            rapport += '═══════════════════════════════════════════════\n\n';
+            rapport += '📋 INFORMATIONS AUTOMATIQUES\n';
+            rapport += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+            rapport += '• ID Incident: ' + id + '\n';
+            rapport += '• Date: ' + date + '\n';
+            rapport += '• Heure: ' + time + '\n';
+            rapport += '• GPS: ' + gps + '\n';
+            rapport += '• Zone: Lyon - Région Auvergne-Rhône-Alpes\n';
+            rapport += '• Agent: Patrouilleur d\'astreinte\n\n';
+            rapport += '⚠️ DESCRIPTION DE L\'INCIDENT\n';
+            console.log('📋 Rapport généré pour:', id);
+            
+            // Essayer de copier dans le presse-papier
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(rapport).then(function() {
+                    console.log('✅ Rapport copié dans le presse-papier');
+                    alert('🚨 INCIDENT ENREGISTRÉ!\n\nID: ' + id + '\nDate: ' + date + '\nHeure: ' + time + '\nGPS: ' + gps + '\n\n📋 Rapport copié dans le presse-papier!\nLe document va s\'ouvrir - collez avec Ctrl+V');
+                }).catch(function(error) {
+                    console.log('❌ Erreur copie presse-papier:', error);
+                    alert('🚨 INCIDENT ENREGISTRÉ!\n\nID: ' + id + '\nDate: ' + date + '\nHeure: ' + time + '\nGPS: ' + gps + '\n\n⚠️ Copie automatique échouée\nLe document va s\'ouvrir');
+                });
+            } else {
+                alert('🚨 INCIDENT ENREGISTRÉ!\n\nID: ' + id + '\nDate: ' + date + '\nHeure: ' + time + '\nGPS: ' + gps + '\n\n📄 Le document va s\'ouvrir');
+            }
+            
+            // Ouvrir le document Google
+            setTimeout(function() {
+                window.open('https://docs.google.com/document/d/1noVZoJXTRZhPxUgIgMmXy1exlvEX4D_l1iKgFVYniVs/edit?usp=sharing', '_blank');
+            }, 1000);
+        }
+        
+        function getActiveThreshold(value) {
+            // Retourne le seuil le plus élevé qui est dépassé
+            var activeThreshold = null;
+            for (var i = 0; i < thresholds.length; i++) {
+                if (value >= thresholds[i].level) {
+                    if (!activeThreshold || thresholds[i].level > activeThreshold.level) {
+                        activeThreshold = thresholds[i];
+                    }
+                }
+            }
+            return activeThreshold;
+        }
+        
+        function showCurrentLevel(value, date, activeThreshold) {
+            var levelDiv = document.getElementById('currentLevel');
+            var updateDiv = document.getElementById('lastUpdate');
+            var alertDiv = document.getElementById('alertZone');
+            var infoDiv = document.getElementById('infoZone');
+            
+            var heightCm = (value * 100).toFixed(1);
+            levelDiv.innerHTML = heightCm + ' cm';
+            updateDiv.innerHTML = 'Dernière mesure: ' + new Date(date).toLocaleString('fr-FR');
+            
+            if (activeThreshold) {
+                // Appliquer la classe CSS correspondant au seuil
+                var cssClass = 'current-level';
+                if (activeThreshold.level === 1.60) cssClass += ' alert-seuil1';
+                else if (activeThreshold.level === 2.80 && activeThreshold.name === 'Seuil 1bis') cssClass += ' alert-seuil1bis';
+                else if (activeThreshold.level === 3.60 && activeThreshold.name === 'Seuil 2') cssClass += ' alert-seuil2';
+                else if (activeThreshold.level === 4.60) cssClass += ' alert-seuil3';
+                else if (activeThreshold.level === 4.80) cssClass += ' alert-seuil4';
+                
+                levelDiv.className = cssClass;
+                
+                // Afficher l'alerte correspondante
+                var alertClass = 'alert-box';
+                if (activeThreshold.level === 1.60) alertClass += ' seuil1';
+                else if (activeThreshold.level === 2.80 && activeThreshold.name === 'Seuil 1bis') alertClass += ' seuil1bis';
+                else if (activeThreshold.level === 3.60 && activeThreshold.name === 'Seuil 2') alertClass += ' seuil2';
+                else if (activeThreshold.level === 4.60) alertClass += ' seuil3';
+                else if (activeThreshold.level === 4.80) alertClass += ' seuil4';
+                
+                alertDiv.innerHTML = '🚨 ' + activeThreshold.name.toUpperCase() + ' DÉPASSÉ!<br>' + 
+                                   'Niveau: ' + heightCm + 'cm - ' + activeThreshold.description;
+                alertDiv.className = alertClass;
+                alertDiv.style.display = 'block';
+                infoDiv.style.display = 'none';
+            } else {
+                levelDiv.className = 'current-level';
+                alertDiv.style.display = 'none';
+                infoDiv.innerHTML = '✅ Station V300002001 - Surveillance continue<br>📊 ' + chartData.length + ' mesures disponibles<br>💧 Niveau normal - Aucun seuil dépassé';
+                infoDiv.className = 'info-box';
+                infoDiv.style.display = 'block';
+            }
+        }
+        
+        function drawChart() {
+            if (chartData.length === 0) return;
+            
+            canvas = document.getElementById('waterChart');
+            ctx = canvas.getContext('2d');
+            
+            var width = canvas.width;
+            var height = canvas.height;
+            var padding = 60;
+            var graphWidth = width - 2 * padding;
+            var graphHeight = height - 2 * padding;
+            
+            var values = chartData.map(function(item) { return item.value; });
+            var minValue = Math.min.apply(Math, values);
+            var maxValue = Math.max.apply(Math, values);
+            
+            // Étendre la plage pour inclure tous les seuils
+            var maxThreshold = Math.max.apply(Math, thresholds.map(function(t) { return t.level; }));
+            if (maxThreshold > maxValue) {
+                maxValue = maxThreshold + 0.2;
+            }
+            
+            var valueRange = maxValue - minValue;
+            if (valueRange < 0.5) {
+                var center = (minValue + maxValue) / 2;
+                minValue = center - 0.25;
+                maxValue = center + 0.25;
+                valueRange = 0.5;
+            }
+            
+            var dates = chartData.map(function(item) { return item.date.getTime(); });
+            var minDate = Math.min.apply(Math, dates);
+            var maxDate = Math.max.apply(Math, dates);
+            var dateRange = maxDate - minDate;
+            
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = '#f8f9fa';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Grille horizontale
+            ctx.strokeStyle = '#e9ecef';
+            ctx.lineWidth = 1;
+            
+            for (var i = 0; i <= 8; i++) {
+                var y = padding + (graphHeight * i / 8);
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(width - padding, y);
+                ctx.stroke();
+                
+                var value = maxValue - (valueRange * i / 8);
+                ctx.fillStyle = '#666';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'right';
+                ctx.fillText((value * 100).toFixed(0) + 'cm', padding - 5, y + 4);
+            }
+            
+            // Dessiner tous les seuils
+            for (var i = 0; i < thresholds.length; i++) {
+                var threshold = thresholds[i];
+                if (threshold.level >= minValue && threshold.level <= maxValue) {
+                    var thresholdY = padding + graphHeight - (graphHeight * (threshold.level - minValue) / valueRange);
+                    
+                    ctx.strokeStyle = threshold.color;
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(padding, thresholdY);
+                    ctx.lineTo(width - padding, thresholdY);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    
+                    ctx.fillStyle = threshold.color;
+                    ctx.font = 'bold 11px Arial';
+                    ctx.textAlign = 'left';
+                    var labelX = padding + 5 + (i * 120); // Décaler les étiquettes pour éviter les chevauchements
+                    if (labelX > width - padding - 100) labelX = padding + 5;
+                    ctx.fillText(threshold.name + ' (' + (threshold.level * 100).toFixed(0) + 'cm)', labelX, thresholdY - 5);
+                }
+            }
+            
+            // Grille verticale (heures)
+            if (dateRange > 0) {
+                var fourHours = 4 * 60 * 60 * 1000;
+                var timeStep = Math.max(fourHours, dateRange / 6);
+                
+                for (var time = minDate; time <= maxDate; time += timeStep) {
+                    var x = padding + (graphWidth * (time - minDate) / dateRange);
+                    ctx.strokeStyle = '#e9ecef';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(x, padding);
+                    ctx.lineTo(x, height - padding);
+                    ctx.stroke();
+                    
+                    var date = new Date(time);
+                    ctx.fillStyle = '#666';
+                    ctx.font = '11px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(date.getHours().toString().padStart(2, '0') + 'h', x, height - padding + 15);
+                }
+            }
+            
+            // Courbe principale
+            ctx.strokeStyle = '#667eea';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            for (var i = 0; i < chartData.length; i++) {
+                var item = chartData[i];
+                var x = dateRange > 0 ? padding + (graphWidth * (item.date.getTime() - minDate) / dateRange) : padding + graphWidth / 2;
+                var y = padding + graphHeight - (graphHeight * (item.value - minValue) / valueRange);
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.stroke();
+            
+            // Points sur la courbe avec couleurs selon les seuils
+            for (var i = 0; i < chartData.length; i++) {
+                var item = chartData[i];
+                var x = dateRange > 0 ? padding + (graphWidth * (item.date.getTime() - minDate) / dateRange) : padding + graphWidth / 2;
+                var y = padding + graphHeight - (graphHeight * (item.value - minValue) / valueRange);
+                
+                var activeThreshold = getActiveThreshold(item.value);
+                var pointColor = activeThreshold ? activeThreshold.color : '#667eea';
+                var pointSize = activeThreshold ? 6 : 4;
+                
+                ctx.fillStyle = pointColor;
+                ctx.beginPath();
+                ctx.arc(x, y, pointSize, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Bordure blanche pour les points d'alerte
+                if (activeThreshold) {
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
+            
+            // Titre du graphique
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Station V300002001 - Hauteur d\'eau avec seuils', width / 2, 25);
+            
+            // Statistiques
+            var avgValue = values.reduce(function(sum, val) { return sum + val; }, 0) / values.length;
+            var activePoints = chartData.filter(function(item) { return getActiveThreshold(item.value); }).length;
+            
+            var stats = 'Points: ' + chartData.length + 
+                       ' | Min: ' + (minValue * 100).toFixed(1) + 'cm' +
+                       ' | Max: ' + (maxValue * 100).toFixed(1) + 'cm' +
+                       ' | Moyenne: ' + (avgValue * 100).toFixed(1) + 'cm' +
+                       ' | Alertes: ' + activePoints;
+            
+            document.getElementById('chartStats').innerHTML = stats;
+            document.getElementById('chartInfo').style.display = 'block';
+            
+            // Interaction clic sur le graphique
+            canvas.onclick = function(event) {
+                var rect = canvas.getBoundingClientRect();
+                var scaleX = canvas.width / rect.width;
+                var scaleY = canvas.height / rect.height;
+                var x = (event.clientX - rect.left) * scaleX;
+                var y = (event.clientY - rect.top) * scaleY;
+                
+                var closestPoint = null;
+                var minDistance = Infinity;
+                
+                for (var i = 0; i < chartData.length; i++) {
+                    var item = chartData[i];
+                    var pointX = dateRange > 0 ? padding + (graphWidth * (item.date.getTime() - minDate) / dateRange) : padding + graphWidth / 2;
+                    var pointY = padding + graphHeight - (graphHeight * (item.value - minValue) / valueRange);
+                    
+                    var distance = Math.sqrt(Math.pow(x - pointX, 2) + Math.pow(y - pointY, 2));
+                    
+                    if (distance < minDistance && distance < 30) {
+                        minDistance = distance;
+                        closestPoint = item;
+                    }
+                }
+                
+                if (closestPoint) {
+                    var activeThreshold = getActiveThreshold(closestPoint.value);
+                    var info = '📊 ' + closestPoint.date.toLocaleString('fr-FR') + 
+                              ' | Hauteur: ' + (closestPoint.value * 100).toFixed(1) + 'cm';
+                    
+                    if (activeThreshold) {
+                        info += ' | 🚨 ' + activeThreshold.name + ' (' + activeThreshold.description + ')';
+                    } else {
+                        info += ' | ✅ Niveau normal';
+                    }
+                    
+                    document.getElementById('clickInfo').innerHTML = info;
+                }
+            };
+        }
+        
+        function loadWaterData() {
+            document.getElementById('currentLevel').innerHTML = '🔄';
+            document.getElementById('lastUpdate').innerHTML = 'Chargement en cours...';
+            
+            var apis = [
+                'https://hubeau.eaufrance.fr/api/v1/hydrometrie/observations_tr?code_entite=V300002001&format=json&size=48',
+                'https://hubeau.eaufrance.fr/api/v2/hydrometrie/obs_elab?code_entite=V300002001&format=json&size=48&grandeur_hydro=H',
+                'https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr?code_entite=V300002001&format=json&size=48'
+            ];
+            
+            tryAPI(0, apis);
+        }
+        
+        function tryAPI(index, apis) {
+            if (index >= apis.length) {
+                document.getElementById('currentLevel').innerHTML = '❌';
+                document.getElementById('lastUpdate').innerHTML = 'Service temporairement indisponible';
+                return;
+            }
+            
+            var apiUrl = apis[index];
+            
+            fetch(apiUrl)
+                .then(function(response) {
+                    if (response.status === 200 || response.status === 206) {
+                        return response.json();
+                    }
+                    throw new Error('HTTP ' + response.status);
+                })
+                .then(function(data) {
+                    if (!data.data || !Array.isArray(data.data) || data.data.length === 0) {
+                        throw new Error('Pas de données');
+                    }
+                    
+                    var success = processAPIData(data.data);
+                    if (!success) {
+                        tryAPI(index + 1, apis);
+                    }
+                })
+                .catch(function(error) {
+                    tryAPI(index + 1, apis);
+                });
+        }
+        
+        function processAPIData(rawData) {
+            chartData = [];
+            var now = new Date();
+            var sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+            
+            for (var i = 0; i < rawData.length; i++) {
+                var item = rawData[i];
+                
+                var dateField = item.date_obs_elab || item.date_obs || item.date_observation;
+                var valueField = item.resultat_obs_elab || item.resultat_obs || item.resultat_observation;
+                
+                if (dateField && valueField !== undefined && valueField !== null) {
+                    var dateObj = new Date(dateField);
+                    var valueNum = parseFloat(valueField);
+                    
+                    if (valueNum > 10) {
+                        valueNum = valueNum / 1000;
+                    }
+                    
+                    if (!isNaN(dateObj.getTime()) && !isNaN(valueNum) && valueNum > 0 && dateObj >= sevenDaysAgo) {
+                        chartData.push({
+                            date: dateObj,
+                            value: valueNum,
+                            station: 'V300002001'
+                        });
+                    }
+                }
+            }
+            
+            if (chartData.length === 0) {
+                return false;
+            }
+            
+            chartData.sort(function(a, b) { return b.date - a.date; });
+            
+            var latest = chartData[0];
+            var activeThreshold = getActiveThreshold(latest.value);
+            
+            showCurrentLevel(latest.value, latest.date, activeThreshold);
+            drawChart();
+            
+            return true;
+        }
+        
+        // Chargement automatique au démarrage
+        setTimeout(function() {
+            loadWaterData();
+        }, 1000);
+        
+        // Enregistrement du Service Worker pour PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker enregistré:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Erreur Service Worker:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
