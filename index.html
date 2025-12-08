@@ -345,21 +345,19 @@
         <!-- 2. Itinéraires -->
         <div class="section">
             <h2>🗺️ Itinéraires Préétablis</h2>
-            <a href="https://www.google.com/maps/d/viewer?mid=1-HlcsxboWarOxhJ06qMahMBkjDOMQDU" class="btn" target="_blank">
-                📍 Itinéraire 1: Triangle → Eaux bleues
-            </a>
-            <a href="https://www.google.com/maps/d/viewer?mid=1vVaezJW-9mFF5b4oteyc-xA69HaNTHM" class="btn" target="_blank">
-                📍 Itinéraire 2: Eaux bleues → Digue Duclos
-            </a>
-            <a href="https://www.google.com/maps/d/viewer?mid=1lDayOhXeVxTh-VxOJkH0bhYP65nFw3U" class="btn" target="_blank">
-                📍 Itinéraire 3: Digue Duclos → Digue St Jean
-            </a>
-            <a href="https://www.google.com/maps/d/viewer?mid=1oVA1hEX2waeiYvpmzox1DCLW_MhcsrQ" class="btn" target="_blank">
-                📍 Itinéraire 4: Annexe 4 - Circuit C
-            </a>
-            <a href="https://www.google.com/maps/d/viewer?mid=1n2Wswd2v5GUN66pp6kQVPsnrphtpfu0" class="btn" target="_blank">
-                📍 Itinéraire 5: Annexe 5 - Circuit D
-            </a>
+            
+            <!-- Boutons de sélection des secteurs -->
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button class="btn" style="flex: 1;" onclick="showItineraires('vaulx')">
+                    📍 SE Vaulx-en-Velin
+                </button>
+                <button class="btn" style="flex: 1;" onclick="showItineraires('villeurbanne')">
+                    📍 SE Villeurbanne
+                </button>
+            </div>
+            
+            <!-- Zone d'affichage des itinéraires -->
+            <div id="itinerairesContainer"></div>
         </div>
         
         <!-- 3. Formulaires -->
@@ -818,6 +816,46 @@
             drawChart();
             
             return true;
+        }
+        
+        // Fonction pour afficher les itinéraires selon le secteur
+        function showItineraires(secteur) {
+            var itineraires = {
+                vaulx: [
+                    { nom: "Digue St Jean", url: "https://www.google.com/maps/d/u/2/edit?mid=1Gr9am_UsQsmUgVEceA6UrlQLQcLhc0E&usp=sharing" },
+                    { nom: "Digue Duclos", url: "https://www.google.com/maps/d/u/2/edit?mid=19Q9OWRfZO9Zc9NJInPFjtgtJPzGFfbk&usp=sharing" },
+                    { nom: "Les eaux bleues", url: "https://www.google.com/maps/d/u/2/edit?mid=1xuvjlfYmt7UZRE7ge-LNNPdcJEYxIm4&usp=sharing" },
+                    { nom: "RN346 – Circuit B", url: "https://www.google.com/maps/d/u/2/edit?mid=1o6Zxd64BSOSE07IeDYvy0Gh-whveLc4&usp=sharing" },
+                    { nom: "RN346 – Circuit A", url: "https://www.google.com/maps/d/u/2/edit?mid=1eUp178SU_qUIVpgVqzdEy97UzShjaik&usp=sharing" },
+                    { nom: "A42 – Circuit D", url: "https://www.google.com/maps/d/u/2/edit?mid=1OjoIxd6LZXW_iMYzVYTb7wRkBMavYzQ&usp=sharing" },
+                    { nom: "A42 – Circuit C", url: "https://www.google.com/maps/d/u/2/edit?mid=1mD_dqfH4oC_-9qsjT1hGWWzekj_4T1Q&usp=sharing" }
+                ],
+                villeurbanne: [
+                    { nom: "Laurent Bonnevay", url: "https://www.google.com/maps/d/u/2/edit?mid=1Zxah_iusW28Dr8_OpF6WjlGid1BZ7Qo&usp=sharing" }
+                ]
+            };
+            
+            var container = document.getElementById('itinerairesContainer');
+            var liste = itineraires[secteur];
+            var html = '';
+            
+            // Générer les boutons pour chaque parcours
+            for (var i = 0; i < liste.length; i++) {
+                var parcours = liste[i];
+                // Convertir l'URL d'édition en URL de visualisation pour mobile
+                var urlViewer = parcours.url.replace('/edit?', '/viewer?');
+                html += '<a href="' + urlViewer + '" class="btn btn-secondary" target="_blank" style="margin-bottom: 10px;">';
+                html += '🗺️ ' + (i + 1) + '. ' + parcours.nom;
+                html += '</a>';
+            }
+            
+            // Afficher avec animation
+            container.style.opacity = '0';
+            container.innerHTML = html;
+            setTimeout(function() {
+                container.style.transition = 'opacity 0.3s ease';
+                container.style.opacity = '1';
+            }, 50);
         }
         
         // Chargement automatique au démarrage
