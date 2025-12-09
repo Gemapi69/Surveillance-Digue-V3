@@ -1,4 +1,4 @@
-const CACHE_NAME = 'surveillance-digue-v2';
+const CACHE_NAME = 'surveillance-digue-v4';
 const urlsToCache = [
   './',
   './index.html',
