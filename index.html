@@ -811,16 +811,48 @@
         function showItineraires(secteur) {
             var itineraires = {
                 vaulx: [
-                    { nom: "Les eaux bleues", url: "https://www.google.com/maps/d/u/2/edit?mid=1xuvjlfYmt7UZRE7ge-LNNPdcJEYxIm4&usp=sharing" },
-                    { nom: "Digue Duclos", url: "https://www.google.com/maps/d/u/2/edit?mid=19Q9OWRfZO9Zc9NJInPFjtgtJPzGFfbk&usp=sharing" },
-                    { nom: "Digue St Jean", url: "https://www.google.com/maps/d/u/2/edit?mid=1Gr9am_UsQsmUgVEceA6UrlQLQcLhc0E&usp=sharing" },
-                    { nom: "A42 – Circuit C", url: "https://www.google.com/maps/d/u/2/edit?mid=1mD_dqfH4oC_-9qsjT1hGWWzekj_4T1Q&usp=sharing" },
-                    { nom: "A42 – Circuit D", url: "https://www.google.com/maps/d/u/2/edit?mid=1OjoIxd6LZXW_iMYzVYTb7wRkBMavYzQ&usp=sharing" },
-                    { nom: "RN346 – Circuit B", url: "https://www.google.com/maps/d/u/2/edit?mid=1o6Zxd64BSOSE07IeDYvy0Gh-whveLc4&usp=sharing" },
-                    { nom: "RN346 – Circuit A", url: "https://www.google.com/maps/d/u/2/edit?mid=1eUp178SU_qUIVpgVqzdEy97UzShjaik&usp=sharing" }
+                    { 
+                        nom: "Les eaux bleues", 
+                        url: "https://www.google.com/maps/d/u/2/edit?mid=1xuvjlfYmt7UZRE7ge-LNNPdcJEYxIm4&usp=sharing",
+                        fiche: "https://docs.google.com/spreadsheets/d/12DId6UUQmEeJo35bNyJqwNoKj0v3Gk6O/edit?usp=sharing&ouid=117931034611088760506&rtpof=true&sd=true"
+                    },
+                    { 
+                        nom: "Digue Duclos", 
+                        url: "https://www.google.com/maps/d/u/2/edit?mid=19Q9OWRfZO9Zc9NJInPFjtgtJPzGFfbk&usp=sharing",
+                        fiche: "https://docs.google.com/spreadsheets/d/1Q0aAIMGfpZGkZhjGI4A8SxfvUFbqQ3Nt/edit?usp=sharing&ouid=117931034611088760506&rtpof=true&sd=true"
+                    },
+                    { 
+                        nom: "Digue St Jean", 
+                        url: "https://www.google.com/maps/d/u/2/edit?mid=1Gr9am_UsQsmUgVEceA6UrlQLQcLhc0E&usp=sharing",
+                        fiche: "https://docs.google.com/spreadsheets/d/12r3N5idjDlybhIREzg9BRDzeDDgg19Nd/edit?usp=sharing&ouid=117931034611088760506&rtpof=true&sd=true"
+                    },
+                    { 
+                        nom: "A42 – Circuit C", 
+                        url: "https://www.google.com/maps/d/u/2/edit?mid=1mD_dqfH4oC_-9qsjT1hGWWzekj_4T1Q&usp=sharing",
+                        fiche: "https://drive.google.com/file/d/1_CZ8kFv-VkRghHEZY0FK58O6MI7boNgI/view?usp=sharing"
+                    },
+                    { 
+                        nom: "A42 – Circuit D", 
+                        url: "https://www.google.com/maps/d/u/2/edit?mid=1OjoIxd6LZXW_iMYzVYTb7wRkBMavYzQ&usp=sharing",
+                        fiche: "https://drive.google.com/file/d/1UMjMurwbv7efatiLdLXVLnqZhw5FDrAi/view?usp=sharing"
+                    },
+                    { 
+                        nom: "RN346 – Circuit B", 
+                        url: "https://www.google.com/maps/d/u/2/edit?mid=1o6Zxd64BSOSE07IeDYvy0Gh-whveLc4&usp=sharing",
+                        fiche: "https://drive.google.com/file/d/1Szs6IxsQPF1GVFpTQuB7Ndbi7QXNHXSY/view?usp=sharing"
+                    },
+                    { 
+                        nom: "RN346 – Circuit A", 
+                        url: "https://www.google.com/maps/d/u/2/edit?mid=1eUp178SU_qUIVpgVqzdEy97UzShjaik&usp=sharing",
+                        fiche: "https://drive.google.com/file/d/1klNfp1ywLQO5xfU8Rak4dTYIQewgIZtS/view?usp=sharing"
+                    }
                 ],
                 villeurbanne: [
-                    { nom: "Laurent Bonnevay", url: "https://www.google.com/maps/d/u/2/edit?mid=1Zxah_iusW28Dr8_OpF6WjlGid1BZ7Qo&usp=sharing" }
+                    { 
+                        nom: "Laurent Bonnevay", 
+                        url: "https://www.google.com/maps/d/u/2/edit?mid=1Zxah_iusW28Dr8_OpF6WjlGid1BZ7Qo&usp=sharing",
+                        fiche: "https://drive.google.com/file/d/1ZAB-aq2ei8bjuPq824ARaZvp0yDgG_cx/view?usp=sharing"
+                    }
                 ]
             };
             
@@ -828,13 +860,20 @@
             var liste = itineraires[secteur];
             var html = '';
             
-            // Générer les boutons pour chaque parcours
+            // Générer les boutons pour chaque parcours avec leur fiche de visite
             for (var i = 0; i < liste.length; i++) {
                 var parcours = liste[i];
                 // Convertir l'URL d'édition en URL de visualisation pour mobile
                 var urlViewer = parcours.url.replace('/edit?', '/viewer?');
-                html += '<a href="' + urlViewer + '" class="btn btn-secondary" target="_blank" style="margin-bottom: 10px;">';
+                
+                // Bouton de l'itinéraire
+                html += '<a href="' + urlViewer + '" class="btn btn-secondary" target="_blank" style="margin-bottom: 5px;">';
                 html += '🗺️ ' + (i + 1) + '. ' + parcours.nom;
+                html += '</a>';
+                
+                // Bouton de la fiche de visite juste en dessous
+                html += '<a href="' + parcours.fiche + '" class="btn btn-success" target="_blank" style="margin-bottom: 20px; font-size: 14px;">';
+                html += '📋 Fiche de visite - ' + parcours.nom;
                 html += '</a>';
             }
             
