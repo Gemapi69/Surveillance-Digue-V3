@@ -1,4 +1,4 @@
-const CACHE_NAME = 'surveillance-digue-v8';
+const CACHE_NAME = 'surveillance-digue-v13';
 const urlsToCache = [
   './',
   './index.html',
@@ -76,4 +76,27 @@ self.addEventListener('activate', function(event) {
   );
   // Force le nouveau Service Worker à prendre le contrôle immédiatement
   return self.clients.claim();
+});
+// Gestion des notifications
+self.addEventListener('notificationclick', function(event) {
+  console.log('🔔 Notification cliquée');
+  event.notification.close();
+  
+  // Ouvrir ou focus sur l'application
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then(function(clientList) {
+        // Si une fenêtre est déjà ouverte, la mettre au premier plan
+        for (var i = 0; i < clientList.length; i++) {
+          var client = clientList[i];
+          if ('focus' in client) {
+            return client.focus();
+          }
+        }
+        // Sinon, ouvrir une nouvelle fenêtre
+        if (clients.openWindow) {
+          return clients.openWindow('./');
+        }
+      })
+  );
 });
