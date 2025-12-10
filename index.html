@@ -265,6 +265,20 @@
             .current-level { font-size: 36px; }
             .chart-canvas { height: 250px; }
         }
+        
+        /* Optimisation pour le mode paysage sur smartphone */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .header { padding: 10px 20px; }
+            .header h1 { font-size: 20px; }
+            .section { padding: 15px; margin-bottom: 15px; }
+            .section h2 { font-size: 18px; margin-bottom: 10px; }
+            .current-level { font-size: 32px; margin: 10px 0; }
+            .chart-canvas { height: 200px; }
+            .btn { padding: 12px 15px; margin-bottom: 8px; font-size: 14px; }
+            .water-level { padding: 15px; }
+            .thresholds-legend { padding: 10px; margin: 10px 0; }
+            .threshold-item { font-size: 12px; margin: 3px 0; }
+        }
     </style>
 </head>
 <body>
@@ -275,6 +289,19 @@
     <div class="container">
         <div class="status-bar">
             📅 <script>document.write(new Date().toLocaleString('fr-FR'));</script> | 📍 Lyon - Région Auvergne-Rhône-Alpes
+        </div>
+        
+        <!-- Notifications -->
+        <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <h3 style="margin: 0; color: white;">🔔 Alertes de franchissement de seuils</h3>
+                    <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Surveillance automatique toutes les 15 minutes</p>
+                </div>
+                <button id="btnNotifications" class="btn" onclick="toggleNotifications()" style="min-width: 120px; background: white; color: #667eea;">
+                    Activer
+                </button>
+            </div>
         </div>
         
         <!-- 1. Monitoring Station V300002001 - SE Vaulx-en-Velin -->
@@ -449,6 +476,21 @@
             <a href="https://docs.google.com/document/d/1noVZoJXTRZhPxUgIgMmXy1exlvEX4D_l1iKgFVYniVs/edit?usp=sharing" class="btn btn-warning" target="_blank">
                 📝 Modification de la déclaration d'incidents
             </a>
+        </div>
+        
+        <!-- 5. Notifications -->
+        <div class="section">
+            <h2>🔔 Alertes de seuils</h2>
+            <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                Recevez une notification lorsqu'un seuil d'eau est franchi
+            </p>
+            
+            <button id="notificationBtn" class="btn btn-success" onclick="toggleNotifications()" style="width: 100%;">
+                🔔 Activer les notifications
+            </button>
+            
+            <div id="notificationStatus" style="margin-top: 15px; padding: 10px; border-radius: 8px; display: none; font-size: 14px;">
+            </div>
         </div>
     </div>
 
@@ -1298,10 +1340,10 @@
             
             var cartes = {
                 vaulx: [
-                    { nom: "Carte 1 - Vaulx-en-Velin", url: "https://drive.google.com/file/d/139aupDKrJroJonY2-P0Apefs0WAuX87n/view?usp=sharing" },
-                    { nom: "Carte 2 - Vaulx-en-Velin", url: "https://drive.google.com/file/d/1yusir_NnZtxbvRH6tBYmkhCY4KaNlno0/view?usp=sharing" },
-                    { nom: "Carte 3 - Vaulx-en-Velin", url: "https://drive.google.com/file/d/11ZjqdhuYC0nwuhMxEWyWmOX49PuTSelc/view?usp=sharing" },
-                    { nom: "Carte 4 - Vaulx-en-Velin", url: "https://drive.google.com/file/d/1cXbRCTHWeMID3k_LS8zpnNBftejYnRlO/view?usp=sharing" }
+                    { nom: "Q30", url: "https://drive.google.com/file/d/1cXbRCTHWeMID3k_LS8zpnNBftejYnRlO/view?usp=sharing" },
+                    { nom: "Q50", url: "https://drive.google.com/file/d/11ZjqdhuYC0nwuhMxEWyWmOX49PuTSelc/view?usp=sharing" },
+                    { nom: "Q100", url: "https://drive.google.com/file/d/1yusir_NnZtxbvRH6tBYmkhCY4KaNlno0/view?usp=sharing" },
+                    { nom: "Q200", url: "https://drive.google.com/file/d/139aupDKrJroJonY2-P0Apefs0WAuX87n/view?usp=sharing" }
                 ],
                 villeurbanne: [
                     { nom: "Carte 1 - Villeurbanne", url: "https://drive.google.com/file/d/1wded4yDG601TTAJqpN0I1ekNENAcEJo2/view?usp=sharing" },
@@ -1329,11 +1371,352 @@
             }, 50);
         }
         
+        // Variables pour le suivi des seuils
+        var dernierSeuilVaulx = null;
+        var dernierSeuilVilleurbanne = null;
+        var notificationsActivees = false;
+        
+        // Fonction pour activer/désactiver les notifications
+        function toggleNotifications() {
+            var btn = document.getElementById('btnNotifications');
+            
+            if (!('Notification' in window)) {
+                alert('❌ Votre navigateur ne supporte pas les notifications');
+                return;
+            }
+            
+            if (Notification.permission === 'denied') {
+                alert('❌ Les notifications ont été bloquées. Veuillez les autoriser dans les paramètres de votre navigateur.');
+                return;
+            }
+            
+            if (!notificationsActivees) {
+                Notification.requestPermission().then(function(permission) {
+                    if (permission === 'granted') {
+                        notificationsActivees = true;
+                        btn.innerHTML = '✅ Activées';
+                        btn.style.background = '#00b894';
+                        btn.style.color = 'white';
+                        console.log('✅ Notifications activées');
+                        // Notification de confirmation
+                        new Notification('🚨 Surveillance Digue', {
+                            body: 'Notifications activées ! Vous serez alerté en cas de franchissement de seuil.\n⏰ Vérification automatique toutes les 15 minutes.',
+                            icon: 'icon-192.png',
+                            badge: 'icon-192.png'
+                        });
+                    } else {
+                        alert('❌ Permission refusée pour les notifications');
+                    }
+                });
+            } else {
+                notificationsActivees = false;
+                btn.innerHTML = 'Activer';
+                btn.style.background = 'white';
+                btn.style.color = '#667eea';
+                console.log('🔕 Notifications désactivées');
+            }
+        }
+        
+        // Mettre à jour le bouton au chargement
+        function mettreAJourBoutonNotifications() {
+            var btn = document.getElementById('btnNotifications');
+            if (Notification.permission === 'granted' && notificationsActivees) {
+                btn.innerHTML = '✅ Activées';
+                btn.style.background = '#00b894';
+                btn.style.color = 'white';
+            } else {
+                btn.innerHTML = 'Activer';
+                btn.style.background = 'white';
+                btn.style.color = '#667eea';
+            }
+        }
+        
+        // Demander la permission pour les notifications
+        function demanderPermissionNotifications() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission().then(function(permission) {
+                    if (permission === 'granted') {
+                        notificationsActivees = true;
+                        console.log('✅ Notifications activées');
+                        // Afficher une notification de test
+                        new Notification('🚨 Surveillance Digue', {
+                            body: 'Notifications activées ! Vous serez alerté en cas de franchissement de seuil.',
+                            icon: 'icon-192.png',
+                            badge: 'icon-192.png'
+                        });
+                    }
+                });
+            } else if (Notification.permission === 'granted') {
+                notificationsActivees = true;
+            }
+        }
+        
+        // Vérifier les franchissements de seuils et envoyer des notifications
+        function verifierEtNotifierSeuils(station, valeur, seuils, dernierSeuil) {
+            if (!notificationsActivees || Notification.permission !== 'granted') {
+                return dernierSeuil;
+            }
+            
+            var seuilActuel = null;
+            for (var i = 0; i < seuils.length; i++) {
+                if (valeur >= seuils[i].level) {
+                    seuilActuel = seuils[i];
+                }
+            }
+            
+            // Si le seuil a changé (franchissement à la hausse ou à la baisse)
+            if (seuilActuel !== dernierSeuil) {
+                var titre = '';
+                var message = '';
+                
+                if (seuilActuel === null && dernierSeuil !== null) {
+                    // Retour à la normale
+                    titre = '✅ ' + station + ' - Retour à la normale';
+                    message = 'Le niveau d\'eau est repassé sous les seuils d\'alerte (' + (valeur * 100).toFixed(0) + 'cm)';
+                } else if (seuilActuel !== null) {
+                    // Franchissement d'un seuil
+                    var emoji = '⚠️';
+                    if (seuilActuel.color === '#D32F2F') {
+                        emoji = '🚨'; // Seuil critique
+                    } else if (seuilActuel.color === '#FF9800') {
+                        emoji = '⚠️'; // Seuil élevé
+                    } else if (seuilActuel.color === '#F57F17') {
+                        emoji = '🟡'; // Seuil moyen
+                    } else {
+                        emoji = '🟣'; // Seuil bas
+                    }
+                    
+                    titre = emoji + ' ' + station + ' - ' + seuilActuel.name;
+                    message = seuilActuel.description + ' franchi ! Niveau actuel: ' + (valeur * 100).toFixed(0) + 'cm (' + valeur.toFixed(2) + 'm)';
+                }
+                
+                // Envoyer la notification
+                if (titre && message) {
+                    new Notification(titre, {
+                        body: message,
+                        icon: 'icon-192.png',
+                        badge: 'icon-192.png',
+                        vibrate: [200, 100, 200],
+                        requireInteraction: true, // La notification reste jusqu'à ce que l'utilisateur la ferme
+                        tag: station // Remplace les anciennes notifications de la même station
+                    });
+                }
+            }
+            
+            return seuilActuel;
+        }
+        
+        // Modifier la fonction processAPIData pour intégrer les notifications
+        var processAPIDataOriginal = processAPIData;
+        processAPIData = function(rawData) {
+            var result = processAPIDataOriginal(rawData);
+            
+            if (result && chartData.length > 0) {
+                var latest = chartData[0];
+                var activeThreshold = getActiveThreshold(latest.value);
+                dernierSeuilVaulx = verifierEtNotifierSeuils('SE Vaulx-en-Velin', latest.value, thresholds, dernierSeuilVaulx);
+            }
+            
+            return result;
+        };
+        
+        // Créer une version modifiée de processAPIData pour Villeurbanne
+        var processAPIData2Original = processAPIData2;
+        processAPIData2 = function(rawData) {
+            var result = processAPIData2Original(rawData);
+            
+            if (result && chartData2.length > 0) {
+                var latest = chartData2[0];
+                var activeThreshold = getActiveThreshold2(latest.value);
+                dernierSeuilVilleurbanne = verifierEtNotifierSeuils('SE Villeurbanne', latest.value, thresholds2, dernierSeuilVilleurbanne);
+            }
+            
+            return result;
+        };
+        
+        // Vérification périodique des données (toutes les 15 minutes)
+        function demarrerSurveillance() {
+            // Vérifier toutes les 15 minutes (900000 ms)
+            setInterval(function() {
+                console.log('🔄 Vérification automatique des niveaux d\'eau...');
+                loadWaterData();
+                loadWaterData2();
+            }, 900000); // 15 minutes
+        }
+        
         // Chargement automatique au démarrage
         setTimeout(function() {
             loadWaterData();
             loadWaterData2();
+            // Mettre à jour l'état du bouton
+            mettreAJourBoutonNotifications();
+            // Démarrer la surveillance périodique
+            demarrerSurveillance();
         }, 1000);
+        
+        // Déverrouiller la rotation d'écran pour PWA installée
+        if ('screen' in window && 'orientation' in window.screen) {
+            // Déverrouiller l'orientation pour permettre la rotation
+            if (window.screen.orientation.unlock) {
+                window.screen.orientation.unlock();
+            }
+            
+            // Permettre toutes les orientations
+            try {
+                if (window.screen.orientation.lock) {
+                    // On ne verrouille pas, on laisse libre
+                    window.screen.orientation.unlock().catch(function(error) {
+                        console.log('Rotation déjà déverrouillée');
+                    });
+                }
+            } catch (error) {
+                console.log('API Screen Orientation non supportée');
+            }
+        }
+        
+        // ========================================
+        // SYSTÈME DE NOTIFICATIONS
+        // ========================================
+        
+        var notificationsEnabled = false;
+        var lastNotifiedThreshold = { vaulx: null, villeurbanne: null };
+        var notificationCheckInterval = null;
+        
+        // Demander la permission pour les notifications
+        function requestNotificationPermission() {
+            if (!('Notification' in window)) {
+                alert('Les notifications ne sont pas supportées par votre navigateur');
+                return Promise.reject('Non supporté');
+            }
+            
+            if (Notification.permission === 'granted') {
+                return Promise.resolve('granted');
+            }
+            
+            if (Notification.permission !== 'denied') {
+                return Notification.requestPermission();
+            }
+            
+            return Promise.reject('denied');
+        }
+        
+        // Envoyer une notification
+        function sendNotification(secteur, threshold) {
+            if (Notification.permission === 'granted') {
+                var title = '🚨 Alerte Surveillance Digue';
+                var body = '⚠️ ' + secteur + ' : ' + threshold.name + ' franchi !\n' +
+                          '💧 Niveau: ' + (threshold.level * 100).toFixed(0) + ' cm\n' +
+                          '📋 ' + threshold.description;
+                
+                var notification = new Notification(title, {
+                    body: body,
+                    icon: 'icon-192.png',
+                    badge: 'icon-192.png',
+                    tag: 'water-alert-' + secteur,
+                    requireInteraction: true,
+                    vibrate: [200, 100, 200, 100, 200],
+                    silent: false
+                });
+                
+                notification.onclick = function() {
+                    window.focus();
+                    this.close();
+                };
+                
+                // Son d'alerte (si possible)
+                try {
+                    var audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIF2a/7OPPbBwBPpzW8MRzKAUrgc7y2Yk2CBdmv+zjz2wcAT6c1vDEcygFK4HO8tmJNggXZr/s489sHAE+nNbwxHMoBSuBzvLZiTYIF2a/7OPPbBwBPpzW8MRzKAUrgc7y2Yk2CBdmv+zjz2wcAT6c1vDEcygFK4HO8tmJNggXZr/s489sHAE+nNbwxHMoBSuBzvLZiTYIF2a/7OPPbBwBPpzW8MRzKAUrx3MoBSuBzvLZiTYIF2a/7OPPbBwBPpzW8MRzKAUrgc7y2Yk2CBdmv+zjz2wcAT6c1vDEcygFK4HO8tmJNggXZr/s489sHAE+nNbwxHMoBSuBzvLZiTYIF2a/7OPPbBwBPpzW8MRzKAUrgc7y2Yk2CBdmv+zjz2wcAT6c1vDEcygFK4HO8tmJNggXZr/s489sHAE+nNbwxHMoBSuBzvLZiTYIF2a/7OPPbBwBPpzW8MRzKAUrgc7y2Yk2CBdmv+zjz2wcAT6c1vDEcygFK4HO8tmJNggXZr/s489sHAE+nNbwxHMoBQ==');
+                    audio.play().catch(function() {
+                        console.log('Son non disponible');
+                    });
+                } catch (error) {
+                    console.log('Audio non supporté');
+                }
+            }
+        }
+        
+        // Vérifier les seuils et notifier si nécessaire
+        function checkThresholdsAndNotify() {
+            // Vérifier SE Vaulx-en-Velin
+            if (chartData && chartData.length > 0) {
+                var latest = chartData[0];
+                var activeThreshold = getActiveThreshold(latest.value);
+                
+                if (activeThreshold && activeThreshold !== lastNotifiedThreshold.vaulx) {
+                    sendNotification('SE Vaulx-en-Velin', activeThreshold);
+                    lastNotifiedThreshold.vaulx = activeThreshold;
+                }
+            }
+            
+            // Vérifier SE Villeurbanne
+            if (chartData2 && chartData2.length > 0) {
+                var latest2 = chartData2[0];
+                var activeThreshold2 = getActiveThreshold2(latest2.value);
+                
+                if (activeThreshold2 && activeThreshold2 !== lastNotifiedThreshold.villeurbanne) {
+                    sendNotification('SE Villeurbanne', activeThreshold2);
+                    lastNotifiedThreshold.villeurbanne = activeThreshold2;
+                }
+            }
+        }
+        
+        // Activer/désactiver les notifications
+        function toggleNotifications() {
+            var btn = document.getElementById('notificationBtn');
+            var status = document.getElementById('notificationStatus');
+            
+            if (!notificationsEnabled) {
+                // Activer les notifications
+                requestNotificationPermission().then(function(permission) {
+                    if (permission === 'granted') {
+                        notificationsEnabled = true;
+                        btn.innerHTML = '🔕 Désactiver les notifications';
+                        btn.className = 'btn btn-warning';
+                        status.style.display = 'block';
+                        status.style.background = '#e8f5e8';
+                        status.style.color = '#2e7d32';
+                        status.innerHTML = '✅ Notifications activées - Vérification toutes les 5 minutes';
+                        
+                        // Vérifier toutes les 5 minutes (300000 ms)
+                        notificationCheckInterval = setInterval(function() {
+                            loadWaterData();
+                            loadWaterData2();
+                            setTimeout(checkThresholdsAndNotify, 2000);
+                        }, 300000);
+                        
+                        // Notification de test
+                        new Notification('🔔 Notifications activées', {
+                            body: 'Vous recevrez une alerte en cas de franchissement de seuil',
+                            icon: 'icon-192.png'
+                        });
+                    } else {
+                        status.style.display = 'block';
+                        status.style.background = '#ffebee';
+                        status.style.color = '#c62828';
+                        status.innerHTML = '❌ Permission refusée. Activez les notifications dans les paramètres de votre navigateur.';
+                    }
+                }).catch(function(error) {
+                    status.style.display = 'block';
+                    status.style.background = '#ffebee';
+                    status.style.color = '#c62828';
+                    status.innerHTML = '❌ Erreur: ' + error;
+                });
+            } else {
+                // Désactiver les notifications
+                notificationsEnabled = false;
+                btn.innerHTML = '🔔 Activer les notifications';
+                btn.className = 'btn btn-success';
+                status.style.display = 'block';
+                status.style.background = '#fff3e0';
+                status.style.color = '#e65100';
+                status.innerHTML = 'ℹ️ Notifications désactivées';
+                
+                if (notificationCheckInterval) {
+                    clearInterval(notificationCheckInterval);
+                    notificationCheckInterval = null;
+                }
+            }
+        }
         
         // Enregistrement du Service Worker pour PWA
         if ('serviceWorker' in navigator) {
