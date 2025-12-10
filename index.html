@@ -793,8 +793,27 @@
             return true;
         }
         
+        // Variable globale pour suivre le secteur actuellement affiché
+        var secteurActif = null;
+        
         // Fonction pour afficher les itinéraires selon le secteur
         function showItineraires(secteur) {
+            var container = document.getElementById('itinerairesContainer');
+            
+            // Si on clique sur le même secteur, on rétracte la liste
+            if (secteurActif === secteur) {
+                container.style.opacity = '0';
+                setTimeout(function() {
+                    container.innerHTML = '';
+                    container.style.opacity = '1';
+                }, 300);
+                secteurActif = null;
+                return;
+            }
+            
+            // Sinon, on affiche le nouveau secteur
+            secteurActif = secteur;
+            
             var itineraires = {
                 vaulx: [
                     { 
