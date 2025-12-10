@@ -360,6 +360,23 @@
             <div id="itinerairesContainer"></div>
         </div>
         
+        <!-- 3. Cartes d'inondation -->
+        <div class="section">
+            <h2>💧 Cartes d'inondation</h2>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button class="btn" style="flex: 1;" onclick="showCartesInondation('vaulx')">
+                    📍 SE Vaulx-en-Velin
+                </button>
+                <button class="btn" style="flex: 1;" onclick="showCartesInondation('villeurbanne')">
+                    📍 SE Villeurbanne
+                </button>
+            </div>
+            
+            <!-- Zone d'affichage des cartes d'inondation -->
+            <div id="cartesInondationContainer"></div>
+        </div>
+        
         <!-- 4. Déclaration désordre -->
         <div class="section">
             <h2>🚨 Déclaration désordre</h2>
@@ -879,6 +896,60 @@
                 // Bouton de la fiche de visite juste en dessous
                 html += '<a href="' + parcours.fiche + '" class="btn btn-success" target="_blank" style="margin-bottom: 20px; font-size: 14px;">';
                 html += '📋 Fiche de visite - ' + parcours.nom;
+                html += '</a>';
+            }
+            
+            // Afficher avec animation
+            container.style.opacity = '0';
+            container.innerHTML = html;
+            setTimeout(function() {
+                container.style.transition = 'opacity 0.3s ease';
+                container.style.opacity = '1';
+            }, 50);
+        }
+        
+        // Variable globale pour suivre le secteur des cartes d'inondation actuellement affiché
+        var secteurCartesActif = null;
+        
+        // Fonction pour afficher les cartes d'inondation selon le secteur
+        function showCartesInondation(secteur) {
+            var container = document.getElementById('cartesInondationContainer');
+            
+            // Si on clique sur le même secteur, on rétracte la liste
+            if (secteurCartesActif === secteur) {
+                container.style.opacity = '0';
+                setTimeout(function() {
+                    container.innerHTML = '';
+                    container.style.opacity = '1';
+                }, 300);
+                secteurCartesActif = null;
+                return;
+            }
+            
+            // Sinon, on affiche le nouveau secteur
+            secteurCartesActif = secteur;
+            
+            var cartes = {
+                vaulx: [
+                    { nom: "Carte 1 - Vaulx-en-Velin", url: "https://drive.google.com/file/d/139aupDKrJroJonY2-P0Apefs0WAuX87n/view?usp=sharing" },
+                    { nom: "Carte 2 - Vaulx-en-Velin", url: "https://drive.google.com/file/d/1yusir_NnZtxbvRH6tBYmkhCY4KaNlno0/view?usp=sharing" },
+                    { nom: "Carte 3 - Vaulx-en-Velin", url: "https://drive.google.com/file/d/11ZjqdhuYC0nwuhMxEWyWmOX49PuTSelc/view?usp=sharing" },
+                    { nom: "Carte 4 - Vaulx-en-Velin", url: "https://drive.google.com/file/d/1cXbRCTHWeMID3k_LS8zpnNBftejYnRlO/view?usp=sharing" }
+                ],
+                villeurbanne: [
+                    { nom: "Carte 1 - Villeurbanne", url: "https://drive.google.com/file/d/1wded4yDG601TTAJqpN0I1ekNENAcEJo2/view?usp=sharing" },
+                    { nom: "Carte 2 - Villeurbanne", url: "https://drive.google.com/file/d/1yBRJCV8_zKyvvMREIm-lveomHlPErH-G/view?usp=sharing" }
+                ]
+            };
+            
+            var liste = cartes[secteur];
+            var html = '';
+            
+            // Générer les boutons pour chaque carte
+            for (var i = 0; i < liste.length; i++) {
+                var carte = liste[i];
+                html += '<a href="' + carte.url + '" class="btn btn-secondary" target="_blank" style="margin-bottom: 10px;">';
+                html += '💧 ' + (i + 1) + '. ' + carte.nom;
                 html += '</a>';
             }
             
