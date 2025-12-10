@@ -277,9 +277,9 @@
             📅 <script>document.write(new Date().toLocaleString('fr-FR'));</script> | 📍 Lyon - Région Auvergne-Rhône-Alpes
         </div>
         
-        <!-- 1. Monitoring Station V300002001 -->
+        <!-- 1. Monitoring Station V300002001 - SE Vaulx-en-Velin -->
         <div class="section">
-            <h2>📊 Station Pont Morand Lyon - Monitoring 24h</h2>
+            <h2>📊 SE Vaulx-en-Velin - Station Pont Morand Lyon - Monitoring 24h</h2>
             
             <div class="water-level">
                 <div style="text-align: center;">
@@ -329,6 +329,67 @@
                 
                 <div style="text-align: center; margin-top: 20px;">
                     <button class="load-btn" onclick="loadWaterData()">
+                        🔄 Actualiser les données
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Liens externes -->
+            <a href="https://www.vigicrues.gouv.fr/station/V300002001" class="btn btn-warning" target="_blank">
+                🌊 Site Vigicrues Officiel
+            </a>
+            
+
+        </div>
+        
+        <!-- 1bis. Monitoring Station SE Villeurbanne -->
+        <div class="section">
+            <h2>📊 SE Villeurbanne - Station Pont Morand Lyon - Monitoring 24h</h2>
+            
+            <div class="water-level">
+                <div style="text-align: center;">
+                    <h3>💧 Hauteur d'eau actuelle</h3>
+                    <div id="waterDisplay2">
+                        <div class="current-level" id="currentLevel2">--</div>
+                        <div id="lastUpdate2" style="color: #666; font-size: 14px;">Chargement...</div>
+                    </div>
+                </div>
+                
+                <div id="alertZone2" style="display: none;"></div>
+                <div id="infoZone2" style="display: none;"></div>
+                
+                <!-- Légende des seuils pour Villeurbanne -->
+                <div class="thresholds-legend">
+                    <h4 style="margin-bottom: 10px;">📏 Seuils de surveillance</h4>
+                    <div class="threshold-item">
+                        <div class="threshold-color" style="background: #7B1FA2;"></div>
+                        <span>Seuil de vigilance 1 préalerte: 400 cm (4.00m)</span>
+                    </div>
+                    <div class="threshold-item">
+                        <div class="threshold-color" style="background: #F57F17;"></div>
+                        <span>Seuil 2 alerte: 460 cm (4.60m)</span>
+                    </div>
+                    <div class="threshold-item">
+                        <div class="threshold-color" style="background: #FF9800;"></div>
+                        <span>Seuil 3: 480 cm (4.80m)</span>
+                    </div>
+                    <div class="threshold-item">
+                        <div class="threshold-color" style="background: #D32F2F;"></div>
+                        <span>Seuil 4 niveau de protection Q200: 550 cm (5.50m)</span>
+                    </div>
+                </div>
+                
+                <!-- Graphique Canvas pour Villeurbanne -->
+                <div style="text-align: center;">
+                    <canvas id="waterChart2" class="chart-canvas" width="800" height="300"></canvas>
+                    <div id="chartInfo2" class="chart-info" style="display: none;">
+                        <div id="clickInfo2">Cliquez sur le graphique pour voir les détails d'un point</div>
+                        <div id="chartStats2" style="margin-top: 10px; font-size: 14px; color: #666;"></div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="load-btn" onclick="loadWaterData2()">
                         🔄 Actualiser les données
                     </button>
                 </div>
@@ -667,7 +728,7 @@
             ctx.fillStyle = '#2c3e50';
             ctx.font = 'bold 16px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('Station V300002001 - Hauteur d\'eau avec seuils', width / 2, 25);
+            ctx.fillText('SE Vaulx-en-Velin - Station V300002001 - Hauteur d\'eau avec seuils', width / 2, 25);
             
             // Statistiques
             var avgValue = values.reduce(function(sum, val) { return sum + val; }, 0) / values.length;
@@ -809,6 +870,312 @@
             
             return true;
         }
+        
+        // ============================================
+        // GRAPHIQUE 2 - SE VILLEURBANNE
+        // ============================================
+        
+        var chartData2 = [];
+        
+        // Définition des seuils pour Villeurbanne
+        var thresholds2 = [
+            { level: 4.00, color: '#7B1FA2', name: 'Seuil 1 préalerte', description: 'Préalerte' },
+            { level: 4.60, color: '#F57F17', name: 'Seuil 2 alerte', description: 'Alerte' },
+            { level: 4.80, color: '#FF9800', name: 'Seuil 3', description: 'Vigilance renforcée' },
+            { level: 5.50, color: '#D32F2F', name: 'Seuil 4 Q200', description: 'Niveau de protection Q200' }
+        ];
+        
+        var canvas2, ctx2;
+        
+        function getActiveThreshold2(value) {
+            var activeThreshold = null;
+            for (var i = 0; i < thresholds2.length; i++) {
+                if (value >= thresholds2[i].level) {
+                    activeThreshold = thresholds2[i];
+                }
+            }
+            return activeThreshold;
+        }
+        
+        function showCurrentLevel2(value, date, activeThreshold) {
+            var levelText = (value * 100).toFixed(1) + ' cm';
+            var dateText = date.toLocaleString('fr-FR');
+            
+            document.getElementById('currentLevel2').innerHTML = levelText;
+            document.getElementById('lastUpdate2').innerHTML = '📅 ' + dateText;
+            
+            var alertZone = document.getElementById('alertZone2');
+            var infoZone = document.getElementById('infoZone2');
+            
+            if (activeThreshold) {
+                var className = 'seuil1';
+                if (activeThreshold.level === 4.60) className = 'seuil2';
+                else if (activeThreshold.level === 4.80) className = 'seuil3';
+                else if (activeThreshold.level === 5.50) className = 'seuil4';
+                
+                alertZone.className = 'alert-box ' + className;
+                alertZone.innerHTML = '🚨 ' + activeThreshold.name + ': ' + activeThreshold.description;
+                alertZone.style.display = 'block';
+                infoZone.style.display = 'none';
+                
+                document.getElementById('currentLevel2').className = 'current-level alert-' + className;
+            } else {
+                alertZone.style.display = 'none';
+                infoZone.className = 'info-box';
+                infoZone.innerHTML = '✅ Niveau normal - Aucune alerte';
+                infoZone.style.display = 'block';
+                document.getElementById('currentLevel2').className = 'current-level';
+            }
+        }
+        
+        function drawChart2() {
+            canvas2 = document.getElementById('waterChart2');
+            if (!canvas2) return;
+            
+            ctx2 = canvas2.getContext('2d');
+            var width = canvas2.width;
+            var height = canvas2.height;
+            var padding = 60;
+            
+            ctx2.clearRect(0, 0, width, height);
+            
+            if (chartData2.length === 0) return;
+            
+            var values = chartData2.map(function(item) { return item.value; });
+            var dates = chartData2.map(function(item) { return item.date; });
+            var minValue = Math.min.apply(null, values);
+            var maxValue = Math.max.apply(null, values);
+            var minDate = Math.min.apply(null, dates.map(function(d) { return d.getTime(); }));
+            var maxDate = Math.max.apply(null, dates.map(function(d) { return d.getTime(); }));
+            
+            minValue = Math.min(minValue, 3.5);
+            maxValue = Math.max(maxValue, 6.0);
+            
+            var valueRange = maxValue - minValue;
+            var dateRange = maxDate - minDate;
+            var graphWidth = width - 2 * padding;
+            var graphHeight = height - 2 * padding;
+            
+            ctx2.fillStyle = '#f8f9fa';
+            ctx2.fillRect(0, 0, width, height);
+            
+            // Dessiner les zones de seuils
+            for (var i = 0; i < thresholds2.length; i++) {
+                var threshold = thresholds2[i];
+                if (threshold.level >= minValue && threshold.level <= maxValue) {
+                    var y = padding + graphHeight - (graphHeight * (threshold.level - minValue) / valueRange);
+                    ctx2.strokeStyle = threshold.color;
+                    ctx2.lineWidth = 2;
+                    ctx2.setLineDash([5, 5]);
+                    ctx2.beginPath();
+                    ctx2.moveTo(padding, y);
+                    ctx2.lineTo(width - padding, y);
+                    ctx2.stroke();
+                    ctx2.setLineDash([]);
+                    
+                    ctx2.fillStyle = threshold.color;
+                    ctx2.font = '11px Arial';
+                    ctx2.textAlign = 'right';
+                    ctx2.fillText((threshold.level * 100) + 'cm', padding - 5, y + 4);
+                }
+            }
+            
+            // Axes
+            ctx2.strokeStyle = '#666';
+            ctx2.lineWidth = 2;
+            ctx2.beginPath();
+            ctx2.moveTo(padding, padding);
+            ctx2.lineTo(padding, height - padding);
+            ctx2.lineTo(width - padding, height - padding);
+            ctx2.stroke();
+            
+            // Dessiner la courbe
+            ctx2.strokeStyle = '#1976d2';
+            ctx2.lineWidth = 2.5;
+            ctx2.beginPath();
+            
+            var sortedData = chartData2.slice().sort(function(a, b) { return a.date - b.date; });
+            
+            for (var i = 0; i < sortedData.length; i++) {
+                var item = sortedData[i];
+                var x = dateRange > 0 ? padding + (graphWidth * (item.date.getTime() - minDate) / dateRange) : padding + graphWidth / 2;
+                var y = padding + graphHeight - (graphHeight * (item.value - minValue) / valueRange);
+                
+                if (i === 0) {
+                    ctx2.moveTo(x, y);
+                } else {
+                    ctx2.lineTo(x, y);
+                }
+            }
+            ctx2.stroke();
+            
+            // Points
+            for (var i = 0; i < sortedData.length; i++) {
+                var item = sortedData[i];
+                var x = dateRange > 0 ? padding + (graphWidth * (item.date.getTime() - minDate) / dateRange) : padding + graphWidth / 2;
+                var y = padding + graphHeight - (graphHeight * (item.value - minValue) / valueRange);
+                
+                var activeThreshold = getActiveThreshold2(item.value);
+                ctx2.fillStyle = activeThreshold ? activeThreshold.color : '#1976d2';
+                
+                ctx2.beginPath();
+                ctx2.arc(x, y, 4, 0, 2 * Math.PI);
+                ctx2.fill();
+                ctx2.strokeStyle = '#fff';
+                ctx2.lineWidth = 1.5;
+                ctx2.stroke();
+            }
+            
+            // Titre
+            ctx2.fillStyle = '#2c3e50';
+            ctx2.font = 'bold 16px Arial';
+            ctx2.textAlign = 'center';
+            ctx2.fillText('SE Villeurbanne - Station V300002001 - Hauteur d\'eau avec seuils', width / 2, 25);
+            
+            // Statistiques
+            var avgValue = values.reduce(function(sum, val) { return sum + val; }, 0) / values.length;
+            var activePoints = chartData2.filter(function(item) { return getActiveThreshold2(item.value); }).length;
+            
+            var stats = 'Points: ' + chartData2.length + 
+                       ' | Min: ' + (minValue * 100).toFixed(1) + 'cm' +
+                       ' | Max: ' + (maxValue * 100).toFixed(1) + 'cm' +
+                       ' | Moyenne: ' + (avgValue * 100).toFixed(1) + 'cm' +
+                       ' | Alertes: ' + activePoints;
+            
+            document.getElementById('chartStats2').innerHTML = stats;
+            document.getElementById('chartInfo2').style.display = 'block';
+            
+            // Interaction clic
+            canvas2.onclick = function(event) {
+                var rect = canvas2.getBoundingClientRect();
+                var scaleX = canvas2.width / rect.width;
+                var scaleY = canvas2.height / rect.height;
+                var x = (event.clientX - rect.left) * scaleX;
+                var y = (event.clientY - rect.top) * scaleY;
+                
+                var closestPoint = null;
+                var minDistance = Infinity;
+                
+                for (var i = 0; i < chartData2.length; i++) {
+                    var item = chartData2[i];
+                    var pointX = dateRange > 0 ? padding + (graphWidth * (item.date.getTime() - minDate) / dateRange) : padding + graphWidth / 2;
+                    var pointY = padding + graphHeight - (graphHeight * (item.value - minValue) / valueRange);
+                    
+                    var distance = Math.sqrt(Math.pow(x - pointX, 2) + Math.pow(y - pointY, 2));
+                    
+                    if (distance < minDistance && distance < 30) {
+                        minDistance = distance;
+                        closestPoint = item;
+                    }
+                }
+                
+                if (closestPoint) {
+                    var activeThreshold = getActiveThreshold2(closestPoint.value);
+                    var info = '📊 ' + closestPoint.date.toLocaleString('fr-FR') + 
+                              ' | Hauteur: ' + (closestPoint.value * 100).toFixed(1) + 'cm';
+                    
+                    if (activeThreshold) {
+                        info += ' | 🚨 ' + activeThreshold.name + ' (' + activeThreshold.description + ')';
+                    } else {
+                        info += ' | ✅ Niveau normal';
+                    }
+                    
+                    document.getElementById('clickInfo2').innerHTML = info;
+                }
+            };
+        }
+        
+        function loadWaterData2() {
+            document.getElementById('currentLevel2').innerHTML = '🔄';
+            document.getElementById('lastUpdate2').innerHTML = 'Chargement en cours...';
+            
+            var apis = [
+                'https://hubeau.eaufrance.fr/api/v1/hydrometrie/observations_tr?code_entite=V300002001&format=json&size=48',
+                'https://hubeau.eaufrance.fr/api/v2/hydrometrie/obs_elab?code_entite=V300002001&format=json&size=48&grandeur_hydro=H',
+                'https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr?code_entite=V300002001&format=json&size=48'
+            ];
+            
+            tryAPI2(0, apis);
+        }
+        
+        function tryAPI2(index, apis) {
+            if (index >= apis.length) {
+                document.getElementById('currentLevel2').innerHTML = '❌';
+                document.getElementById('lastUpdate2').innerHTML = 'Service temporairement indisponible';
+                return;
+            }
+            
+            var apiUrl = apis[index];
+            
+            fetch(apiUrl)
+                .then(function(response) {
+                    if (response.status === 200 || response.status === 206) {
+                        return response.json();
+                    }
+                    throw new Error('HTTP ' + response.status);
+                })
+                .then(function(data) {
+                    if (!data.data || !Array.isArray(data.data) || data.data.length === 0) {
+                        throw new Error('Pas de données');
+                    }
+                    
+                    var success = processAPIData2(data.data);
+                    if (!success) {
+                        tryAPI2(index + 1, apis);
+                    }
+                })
+                .catch(function(error) {
+                    tryAPI2(index + 1, apis);
+                });
+        }
+        
+        function processAPIData2(rawData) {
+            chartData2 = [];
+            var now = new Date();
+            var sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+            
+            for (var i = 0; i < rawData.length; i++) {
+                var item = rawData[i];
+                
+                var dateField = item.date_obs_elab || item.date_obs || item.date_observation;
+                var valueField = item.resultat_obs_elab || item.resultat_obs || item.resultat_observation;
+                
+                if (dateField && valueField !== undefined && valueField !== null) {
+                    var dateObj = new Date(dateField);
+                    var valueNum = parseFloat(valueField);
+                    
+                    if (valueNum > 10) {
+                        valueNum = valueNum / 1000;
+                    }
+                    
+                    if (!isNaN(dateObj.getTime()) && !isNaN(valueNum) && valueNum > 0 && dateObj >= sevenDaysAgo) {
+                        chartData2.push({
+                            date: dateObj,
+                            value: valueNum,
+                            station: 'V300002001'
+                        });
+                    }
+                }
+            }
+            
+            if (chartData2.length === 0) {
+                return false;
+            }
+            
+            chartData2.sort(function(a, b) { return b.date - a.date; });
+            
+            var latest = chartData2[0];
+            var activeThreshold = getActiveThreshold2(latest.value);
+            
+            showCurrentLevel2(latest.value, latest.date, activeThreshold);
+            drawChart2();
+            
+            return true;
+        }
+        
+        // ============================================
+        // FIN GRAPHIQUE 2
+        // ============================================
         
         // Variable globale pour suivre le secteur actuellement affiché
         var secteurActif = null;
@@ -965,6 +1332,7 @@
         // Chargement automatique au démarrage
         setTimeout(function() {
             loadWaterData();
+            loadWaterData2();
         }, 1000);
         
         // Enregistrement du Service Worker pour PWA
