@@ -1,3 +1,95 @@
+Tu es une experte en développement de sites web.
+Analyse attentivement le code que je vais te fournir.
+Je souhaite que tu modifies ce code en supprimant uniquement :
+les blocs de déclaration de désordres
+les fiches de visites, je dispose de Vs Code pour le faire.
+⚠️ Contraintes importantes :
+Ne modifie pas l’interface utilisateur.
+Ne change pas le design.
+Ne modifie pas le fonctionnement des autres fonctionnalités.
+Ne touche à rien d’autre que les éléments demandés.
+Tu peux soit :
+m’expliquer pas à pas les modifications à faire,
+ou
+me fournir directement la version complète du code modifié, propre et fonctionnelle.
+07:51
+A consulté 3 fichiers, a exécuté une commande
+
+J'ai bien analysé le code. Voici exactement ce qu'il faut supprimer. Le fichier étant de taille raisonnable (216 lignes), je te fournis directement la version modifiée complète.
+
+Éléments à supprimer :
+
+    Bloc "Déclaration de désordre" → section HTML lignes 123–126 + fonctions JS declareIncident() et generateIncidentReport() (lignes 197–198)
+    Fiches de visite → dans la fonction showItineraires(), les liens 📋 Fiche de visite — générés pour chaque itinéraire (ligne 200), et les propriétés fiche: dans les données
+
+2 fichiers modifiés, a exécuté une commande
+
+Maintenant je supprime les fiches de visite dans showItineraires() — je retire les lignes qui génèrent les boutons 📋 Fiche de visite et les propriétés fiche: dans les données :
+2 fichiers modifiés, a exécuté une commande, lu un fichier
+
+Voici le fichier modifié. Voici un résumé précis de ce qui a été supprimé :
+
+✅ Supprimé — Bloc "Déclaration de désordre"
+
+    La section entière (titre, bouton rouge d'urgence, lien "Modifier le formulaire")
+    La fonction JS declareIncident()
+    La fonction JS generateIncidentReport()
+
+✅ Supprimé — Fiches de visite
+
+    Les boutons 📋 Fiche de visite — [nom] générés dans showItineraires()
+    Toutes les propriétés fiche: dans les données des itinéraires (Vaulx et Villeurbanne)
+
+Rien d'autre n'a été touché : design, styles CSS, graphiques, cartes d'inondation, notifications et données hydrologiques sont intacts.
+Index
+Code · HTML 
+
+peut tu modifier ces deux fichiers pour correspondre au nouveau code html
+07:55
+
+Je lis les fichiers pour voir ce qui doit être mis à jour.
+Vérifier ce qui reste dans le HTML modifié
+
+Il reste aussi le CSS orphelin .emergency-button et @keyframes pulse-emergency à nettoyer. Je m'occupe des 3 fichiers :
+Supprimer le CSS orphelin emergency-button et pulse-emergency
+
+Maintenant le manifest.json — rien à changer fonctionnellement, mais je mets à jour la version du cache dans sw.js et je vérifie que le manifest est cohérent :
+2 fichiers créés, lu un fichier
+
+Les 3 fichiers sont prêts. Voici ce qui a été fait :
+
+index.html — en plus des suppressions précédentes, j'ai retiré le CSS orphelin .emergency-button et @keyframes pulse-emergency qui n'avaient plus d'utilité.
+
+sw.js — version du cache passée de v15 → v16. C'est l'unique modification nécessaire : cela force les appareils à invalider l'ancien cache et à télécharger le nouveau index.html au prochain chargement.
+
+manifest.json — aucune modification nécessaire, il reste identique (il ne référençait pas les éléments supprimés).
+Index
+Code · HTML 
+Sw
+JS 
+Manifest
+Code · JSON 
+
+Parfait, maintenant je voudrais que la tuile Vigicrue -site officel soit en bleue et pas marron, que la tuile alerte de seuils soit enlevé.
+13:39
+3 fichiers modifiés, consulté un fichier, a exécuté une commande
+
+Les deux boutons Vigicrues sont bien en bleu (btn-action) et la section "Alertes de seuils" est supprimée. Les occurrences restantes de notificationBtn et btn-warning dans le JS concernent uniquement le système de notifications de la bannière en haut (le bouton "Activer" dans le header) — ce n'est pas lié à la section supprimée, je les laisse intacts.
+Presented file
+
+Deux modifications appliquées :
+
+    Boutons Vigicrues (Vaulx et Villeurbanne) : btn-warning (marron) → btn-action (bleu #0077CC)
+    Section "Alertes de seuils" : entièrement supprimée
+
+    ⚠️ Note : la bannière de notifications en haut de page (🔔 Alertes de franchissement de seuils) et son bouton "Activer" sont conservés car ils font partie de l'en-tête général. Si tu veux les supprimer aussi, dis-le moi.
+
+Index
+Code · HTML 
+
+
+Claude est une IA et peut faire des erreurs. Veuillez vérifier les réponses.
+Index · HTML
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -65,8 +157,7 @@
         .btn-row{display:flex;gap:8px;margin-bottom:12px}
         .btn-row .btn{flex:1;margin-bottom:0;justify-content:center}
         .btn-icon{font-size:15px;flex-shrink:0}
-        .emergency-button{background:var(--s4)!important;border:2px solid #FCA5A5!important;width:100%;padding:18px 20px!important;font-size:15px!important;font-weight:700!important;text-transform:uppercase!important;letter-spacing:.08em!important;justify-content:center!important;margin-bottom:8px;animation:pulse-emergency 2.5s infinite}
-        @keyframes pulse-emergency{0%,100%{box-shadow:0 0 0 0 rgba(185,28,28,.4)}50%{box-shadow:0 0 0 8px rgba(185,28,28,0)}}
+
         .notif-status{margin-top:12px;padding:10px 14px;border-radius:3px;font-size:12px;border-left:4px solid;display:none;font-family:var(--m)}
         .notif-status.ok{background:var(--sgb);color:var(--sg);border-left-color:var(--sge)}.notif-status.err{background:#FEE2E2;color:var(--s4);border-left-color:var(--s4)}.notif-status.off{background:#FEF3C7;color:#92400E;border-left-color:#92400E}
         .load-btn{background:var(--bm);color:#fff;border:none;padding:10px 20px;border-radius:3px;cursor:pointer;font-size:13px;font-family:var(--f);font-weight:600;letter-spacing:.02em;transition:background .15s;display:inline-flex;align-items:center;gap:6px}
@@ -95,7 +186,7 @@
 <div id="chartInfo" class="chart-info" style="display:none;"><div id="clickInfo">Cliquez sur le graphique pour afficher les détails d'un point</div><div id="chartStats" style="margin-top:6px;"></div></div>
 <div style="margin-top:14px;text-align:center;"><button class="load-btn" onclick="loadWaterData()">↻ Actualiser les données</button></div>
 <div class="divider"></div>
-<a href="https://www.vigicrues.gouv.fr/station/V300002001" class="btn btn-warning" target="_blank"><span class="btn-icon">🌊</span> Vigicrues — Site officiel</a>
+<a href="https://www.vigicrues.gouv.fr/station/V300002001" class="btn btn-action" target="_blank"><span class="btn-icon">🌊</span> Vigicrues — Site officiel</a>
 </div></div>
 <div class="section"><div class="section-header"><span class="section-header-icon">📊</span><h2>SE Villeurbanne — Station Pont Morand</h2><span class="badge">V300002001</span></div><div class="section-body">
 <div class="water-level-panel" id="waterPanel2"><div class="level-label">Hauteur d'eau actuelle</div><div class="level-display"><div class="current-level" id="currentLevel2">--</div><div class="level-unit">cm</div></div><div class="last-update" id="lastUpdate2">Chargement en cours…</div></div>
@@ -110,7 +201,7 @@
 <div id="chartInfo2" class="chart-info" style="display:none;"><div id="clickInfo2">Cliquez sur le graphique pour afficher les détails d'un point</div><div id="chartStats2" style="margin-top:6px;"></div></div>
 <div style="margin-top:14px;text-align:center;"><button class="load-btn" onclick="loadWaterData2()">↻ Actualiser les données</button></div>
 <div class="divider"></div>
-<a href="https://www.vigicrues.gouv.fr/station/V300002001" class="btn btn-warning" target="_blank"><span class="btn-icon">🌊</span> Vigicrues — Site officiel</a>
+<a href="https://www.vigicrues.gouv.fr/station/V300002001" class="btn btn-action" target="_blank"><span class="btn-icon">🌊</span> Vigicrues — Site officiel</a>
 </div></div>
 <div class="section"><div class="section-header"><span class="section-header-icon">🗺️</span><h2>Itinéraires préétablis</h2></div><div class="section-body">
 <div class="btn-row"><button class="btn btn-secondary" onclick="showItineraires('vaulx')"><span class="btn-icon">📍</span> SE Vaulx-en-Velin</button><button class="btn btn-secondary" onclick="showItineraires('villeurbanne')"><span class="btn-icon">📍</span> SE Villeurbanne</button></div>
@@ -121,11 +212,6 @@
 <div id="cartesInondationContainer"></div>
 </div></div>
 
-<div class="section"><div class="section-header"><span class="section-header-icon">🔔</span><h2>Alertes de seuils</h2></div><div class="section-body">
-<p style="color:var(--gm);margin-bottom:12px;font-size:13px;">Recevez une notification lorsqu'un seuil d'eau est franchi.</p>
-<button id="notificationBtn" class="btn btn-success" onclick="toggleNotifications()" style="width:100%;justify-content:center;"><span class="btn-icon">🔔</span> Activer les notifications</button>
-<div id="notificationStatus" class="notif-status"></div>
-</div></div>
 </div>
 <script>
 function updateClock(){var now=new Date(),opts={weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'};document.getElementById('headerDate').textContent=now.toLocaleDateString('fr-FR',opts).toUpperCase();document.getElementById('headerTime').textContent=now.toLocaleTimeString('fr-FR');document.getElementById('statusDateTime').textContent=now.toLocaleDateString('fr-FR')+' '+now.toLocaleTimeString('fr-FR');}
@@ -211,3 +297,4 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){navig
 </script>
 </body>
 </html>
+
