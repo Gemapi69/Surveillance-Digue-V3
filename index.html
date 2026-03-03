@@ -3,1730 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surveillance Digue</title>
-    
-    <!-- PWA Meta Tags -->
+    <title>Surveillance Digue — Grand Lyon</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#667eea">
+    <meta name="theme-color" content="#003865">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Surveillance Digue">
     <link rel="apple-touch-icon" href="icon-192.png">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        
-        .header {
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
-            padding: 15px 20px;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        
-        .header h1 {
-            color: #2c3e50;
-            font-size: 24px;
-            font-weight: 700;
-        }
-        
-        .container {
-            padding: 20px;
-            max-width: 100%;
-        }
-        
-        .section {
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            margin-bottom: 20px;
-            padding: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-        }
-        
-        .section h2 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 20px;
-        }
-        
-        .btn {
-            display: block;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            text-decoration: none;
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            font-weight: 500;
-            text-align: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            border: none;
-            cursor: pointer;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-        
-        .btn-secondary {
-            background: linear-gradient(45deg, #74b9ff, #0984e3);
-        }
-        
-        .btn-success {
-            background: linear-gradient(45deg, #00b894, #00cec9);
-        }
-        
-        .btn-warning {
-            background: linear-gradient(45deg, #fdcb6e, #e17055);
-        }
-        
-        .emergency-button {
-            background: linear-gradient(45deg, #e74c3c, #c0392b) !important;
-            color: white;
-            border: 3px solid #fff;
-            box-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
-            font-weight: bold;
-            font-size: 16px;
-            text-transform: uppercase;
-            animation: pulse-red 2s infinite;
-        }
-        
-        @keyframes pulse-red {
-            0% { box-shadow: 0 0 20px rgba(231, 76, 60, 0.5); }
-            50% { box-shadow: 0 0 30px rgba(231, 76, 60, 0.8); }
-            100% { box-shadow: 0 0 20px rgba(231, 76, 60, 0.5); }
-        }
-
-        .status-bar {
-            background: rgba(0,0,0,0.05);
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 14px;
-            color: #555;
-        }
-
-        .water-level {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .current-level {
-            font-size: 48px;
-            font-weight: bold;
-            color: #1976d2;
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .alert-high {
-            color: #c62828 !important;
-            animation: blink 1s infinite;
-        }
-
-        .alert-seuil1 { color: #7B1FA2 !important; }
-        .alert-seuil1bis { color: #F57F17 !important; }
-        .alert-seuil2 { color: #F57F17 !important; }
-        .alert-seuil3 { color: #FF9800 !important; }
-        .alert-seuil4 { color: #D32F2F !important; animation: blink 1s infinite; }
-
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0.5; }
-        }
-
-        .alert-box {
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-            font-weight: bold;
-            text-align: center;
-            border: 2px solid;
-        }
-
-        .alert-box.seuil1 {
-            background: #F3E5F5;
-            color: #7B1FA2;
-            border-color: #7B1FA2;
-        }
-
-        .alert-box.seuil1bis {
-            background: #FFFDE7;
-            color: #F57F17;
-            border-color: #F57F17;
-        }
-
-        .alert-box.seuil2 {
-            background: #FFFDE7;
-            color: #F57F17;
-            border-color: #F57F17;
-        }
-
-        .alert-box.seuil3 {
-            background: #FFF3E0;
-            color: #FF9800;
-            border-color: #FF9800;
-        }
-
-        .alert-box.seuil4 {
-            background: #FFEBEE;
-            color: #D32F2F;
-            border-color: #D32F2F;
-            animation: pulse-alert 2s infinite;
-        }
-
-        @keyframes pulse-alert {
-            0% { background: #FFEBEE; }
-            50% { background: #FFCDD2; }
-            100% { background: #FFEBEE; }
-        }
-
-        .info-box {
-            background: #e8f5e8;
-            color: #2e7d32;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-            text-align: center;
-        }
-
-        .chart-canvas {
-            width: 100%;
-            max-width: 800px;
-            height: 300px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            margin: 20px 0;
-            cursor: crosshair;
-        }
-
-        .chart-info {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border-left: 4px solid #667eea;
-        }
-
-        .load-btn {
-            background: #2196f3;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            margin: 10px 5px;
-        }
-
-        .thresholds-legend {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
-            border-left: 4px solid #667eea;
-        }
-
-        .threshold-item {
-            display: flex;
-            align-items: center;
-            margin: 5px 0;
-            font-size: 14px;
-        }
-
-        .threshold-color {
-            width: 20px;
-            height: 3px;
-            margin-right: 10px;
-            border-radius: 2px;
-        }
-        
-        @media (max-width: 480px) {
-            .container { padding: 10px; }
-            .section { padding: 15px; }
-            .current-level { font-size: 36px; }
-            .chart-canvas { height: 250px; }
-        }
-        
-        /* Optimisation pour le mode paysage sur smartphone */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .header { padding: 10px 20px; }
-            .header h1 { font-size: 20px; }
-            .section { padding: 15px; margin-bottom: 15px; }
-            .section h2 { font-size: 18px; margin-bottom: 10px; }
-            .current-level { font-size: 32px; margin: 10px 0; }
-            .chart-canvas { height: 200px; }
-            .btn { padding: 12px 15px; margin-bottom: 8px; font-size: 14px; }
-            .water-level { padding: 15px; }
-            .thresholds-legend { padding: 10px; margin: 10px 0; }
-            .threshold-item { font-size: 12px; margin: 3px 0; }
-        }
+        :root{--bd:#003865;--bm:#005B9E;--bl:#0077CC;--bp:#E8F2FB;--gd:#1A2332;--gm:#4A5568;--gl:#8FA3B8;--gp:#EEF2F7;--w:#FFF;--br:#C8D8E8;--s1:#6B21A8;--s1b:#B45309;--s2:#D97706;--s3:#EA580C;--s4:#B91C1C;--sg:#166534;--sgb:#DCFCE7;--sge:#16A34A;--f:'IBM Plex Sans',sans-serif;--m:'IBM Plex Mono',monospace}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:var(--f);background:var(--gp);color:var(--gd);min-height:100vh}
+        .status-bar{background:var(--bd);color:var(--gl);font-family:var(--m);font-size:11px;padding:5px 20px;display:flex;align-items:center;gap:14px;border-bottom:1px solid rgba(255,255,255,.08)}
+        .status-dot{width:6px;height:6px;border-radius:50%;background:#4ADE80;flex-shrink:0;animation:blink-dot 2s infinite}
+        @keyframes blink-dot{0%,100%{opacity:1}50%{opacity:.3}}
+        .header{background:var(--bd);color:var(--w);position:sticky;top:0;z-index:1000;border-bottom:3px solid var(--bl)}
+        .header-inner{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:56px}
+        .header-brand{display:flex;align-items:center;gap:12px}
+        .header-logo-mark{width:32px;height:32px;background:var(--bl);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+        .header-title{font-size:15px;font-weight:600;letter-spacing:.02em;line-height:1.2}
+        .header-subtitle{font-size:11px;color:var(--gl);font-weight:400;letter-spacing:.04em;text-transform:uppercase}
+        .header-meta{font-family:var(--m);font-size:11px;color:var(--gl);text-align:right;line-height:1.6}
+        .container{padding:16px;max-width:860px;margin:0 auto}
+        .section{background:var(--w);border:1px solid var(--br);border-radius:4px;margin-bottom:12px;overflow:hidden}
+        .section-header{background:var(--bd);color:var(--w);padding:10px 16px;display:flex;align-items:center;gap:10px}
+        .section-header-icon{font-size:14px;opacity:.8}
+        .section-header h2{font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+        .section-header .badge{margin-left:auto;background:var(--bl);color:#fff;font-family:var(--m);font-size:10px;padding:2px 8px;border-radius:2px;letter-spacing:.04em}
+        .section-body{padding:16px}
+        .notif-banner{background:var(--bm);border-bottom:2px solid var(--bl)}
+        .notif-banner-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;gap:12px}
+        .notif-banner-text h3{font-size:13px;font-weight:600;color:var(--w);letter-spacing:.03em}
+        .notif-banner-text p{font-size:11px;color:rgba(255,255,255,.7);margin-top:2px;font-family:var(--m)}
+        .notif-toggle-btn{background:var(--w);color:var(--bd);border:none;padding:8px 16px;border-radius:3px;cursor:pointer;font-family:var(--f);font-size:12px;font-weight:600;white-space:nowrap;transition:background .15s;letter-spacing:.02em;flex-shrink:0}
+        .notif-toggle-btn:hover{background:var(--bp)}
+        .notif-toggle-btn.active{background:#4ADE80;color:#052e16}
+        .water-level-panel{background:var(--gp);border:1px solid var(--br);border-radius:3px;padding:16px;margin-bottom:12px}
+        .level-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--gm);margin-bottom:4px}
+        .level-display{display:flex;align-items:flex-end;gap:10px;margin-bottom:6px}
+        .current-level{font-family:var(--m);font-size:52px;font-weight:600;color:var(--bd);line-height:1}
+        .level-unit{font-family:var(--m);font-size:16px;color:var(--gm);margin-bottom:6px}
+        .last-update{font-family:var(--m);font-size:11px;color:var(--gl)}
+        .alert-seuil1 .current-level{color:var(--s1)}.alert-seuil1bis .current-level{color:var(--s1b)}.alert-seuil2 .current-level{color:var(--s2)}.alert-seuil3 .current-level{color:var(--s3)}.alert-seuil4 .current-level{color:var(--s4);animation:blink-val 1s infinite}
+        @keyframes blink-val{0%,50%{opacity:1}51%,100%{opacity:.5}}
+        .alert-box{padding:10px 14px;border-radius:3px;margin:10px 0;font-weight:600;font-size:13px;border-left:4px solid;display:flex;align-items:center;gap:8px}
+        .alert-box.seuil1{background:#F3E5F5;color:var(--s1);border-left-color:var(--s1)}.alert-box.seuil1bis{background:#FEF3C7;color:var(--s1b);border-left-color:var(--s1b)}.alert-box.seuil2{background:#FEF3C7;color:var(--s2);border-left-color:var(--s2)}.alert-box.seuil3{background:#FFEDD5;color:var(--s3);border-left-color:var(--s3)}.alert-box.seuil4{background:#FEE2E2;color:var(--s4);border-left-color:var(--s4);animation:pulse-alert 2s infinite}
+        @keyframes pulse-alert{0%,100%{background:#FEE2E2}50%{background:#FECACA}}
+        .info-box{background:var(--sgb);color:var(--sg);padding:10px 14px;border-radius:3px;margin:10px 0;font-size:13px;font-weight:500;border-left:4px solid var(--sge)}
+        .thresholds-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px}
+        .thresholds-table th{background:var(--gp);color:var(--gm);font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:10px;padding:6px 10px;text-align:left;border-bottom:1px solid var(--br)}
+        .thresholds-table td{padding:7px 10px;border-bottom:1px solid var(--gp);vertical-align:middle}
+        .threshold-swatch{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;vertical-align:middle}
+        .chart-canvas{width:100%;max-width:100%;height:280px;border:1px solid var(--br);border-radius:3px;margin:12px 0;cursor:crosshair;display:block;background:var(--gp)}
+        .chart-info{background:var(--gp);border:1px solid var(--br);padding:10px 14px;border-radius:3px;font-family:var(--m);font-size:11px;color:var(--gm)}
+        .btn{display:flex;align-items:center;gap:8px;color:#fff;text-decoration:none;padding:12px 16px;border-radius:3px;margin-bottom:8px;font-weight:600;font-size:13px;transition:filter .15s,transform .1s;border:none;cursor:pointer;letter-spacing:.02em}
+        .btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+        .btn-secondary{background:#1D5FB0}.btn-action{background:var(--bl)}.btn-warning{background:#92400E}.btn-success{background:var(--sg)}
+        .btn-row{display:flex;gap:8px;margin-bottom:12px}
+        .btn-row .btn{flex:1;margin-bottom:0;justify-content:center}
+        .btn-icon{font-size:15px;flex-shrink:0}
+        .emergency-button{background:var(--s4)!important;border:2px solid #FCA5A5!important;width:100%;padding:18px 20px!important;font-size:15px!important;font-weight:700!important;text-transform:uppercase!important;letter-spacing:.08em!important;justify-content:center!important;margin-bottom:8px;animation:pulse-emergency 2.5s infinite}
+        @keyframes pulse-emergency{0%,100%{box-shadow:0 0 0 0 rgba(185,28,28,.4)}50%{box-shadow:0 0 0 8px rgba(185,28,28,0)}}
+        .notif-status{margin-top:12px;padding:10px 14px;border-radius:3px;font-size:12px;border-left:4px solid;display:none;font-family:var(--m)}
+        .notif-status.ok{background:var(--sgb);color:var(--sg);border-left-color:var(--sge)}.notif-status.err{background:#FEE2E2;color:var(--s4);border-left-color:var(--s4)}.notif-status.off{background:#FEF3C7;color:#92400E;border-left-color:#92400E}
+        .load-btn{background:var(--bm);color:#fff;border:none;padding:10px 20px;border-radius:3px;cursor:pointer;font-size:13px;font-family:var(--f);font-weight:600;letter-spacing:.02em;transition:background .15s;display:inline-flex;align-items:center;gap:6px}
+        .load-btn:hover{background:var(--bl)}
+        .divider{height:1px;background:var(--br);margin:16px 0}
+        @media(max-width:480px){.container{padding:10px}.current-level{font-size:40px}.chart-canvas{height:220px}.header-meta{display:none}.section-header h2{font-size:12px}}
+        @media(max-height:500px) and (orientation:landscape){.header-inner{height:44px}.current-level{font-size:36px}.chart-canvas{height:180px}.section-body{padding:10px}}
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🚨 Surveillance Digue</h1>
-    </div>
-    
-    <div class="container">
-        <div class="status-bar">
-            📅 <script>document.write(new Date().toLocaleString('fr-FR'));</script> | 📍 Lyon - Région Auvergne-Rhône-Alpes
-        </div>
-        
-        <!-- Notifications -->
-        <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div>
-                    <h3 style="margin: 0; color: white;">🔔 Alertes de franchissement de seuils</h3>
-                    <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Surveillance automatique toutes les 15 minutes</p>
-                </div>
-                <button id="btnNotifications" class="btn" onclick="toggleNotifications()" style="min-width: 120px; background: white; color: #667eea;">
-                    Activer
-                </button>
-            </div>
-        </div>
-        
-        <!-- 1. Monitoring Station V300002001 - SE Vaulx-en-Velin -->
-        <div class="section">
-            <h2>📊 SE Vaulx-en-Velin - Station Pont Morand Lyon - Monitoring 24h</h2>
-            
-            <div class="water-level">
-                <div style="text-align: center;">
-                    <h3>💧 Hauteur d'eau actuelle</h3>
-                    <div id="waterDisplay">
-                        <div class="current-level" id="currentLevel">--</div>
-                        <div id="lastUpdate" style="color: #666; font-size: 14px;">Chargement...</div>
-                    </div>
-                </div>
-                
-                <div id="alertZone" style="display: none;"></div>
-                <div id="infoZone" style="display: none;"></div>
-                
-                <!-- Légende des seuils -->
-                <div class="thresholds-legend">
-                    <h4 style="margin-bottom: 10px;">📏 Seuils de surveillance</h4>
-                    <div class="threshold-item">
-                        <div class="threshold-color" style="background: #7B1FA2;"></div>
-                        <span>Seuil de vigilance 1: 160 cm (1.60m)</span>
-                    </div>
-                    <div class="threshold-item">
-                        <div class="threshold-color" style="background: #F57F17;"></div>
-                        <span>Seuil de vigilance 1bis: 280 cm (2.80m)</span>
-                    </div>
-                    <div class="threshold-item">
-                        <div class="threshold-color" style="background: #F57F17;"></div>
-                        <span>Seuil de vigilance 2: 360 cm (3.60m)</span>
-                    </div>
-                    <div class="threshold-item">
-                        <div class="threshold-color" style="background: #FF9800;"></div>
-                        <span>Seuil de vigilance 3 (niveau de protection): 460 cm (4.60m)</span>
-                    </div>
-                    <div class="threshold-item">
-                        <div class="threshold-color" style="background: #D32F2F;"></div>
-                        <span>Seuil de vigilance 4 (niveau de danger): 480 cm (4.80m)</span>
-                    </div>
-                </div>
-                
-                <!-- Graphique Canvas -->
-                <div style="text-align: center;">
-                    <canvas id="waterChart" class="chart-canvas" width="800" height="300"></canvas>
-                    <div id="chartInfo" class="chart-info" style="display: none;">
-                        <div id="clickInfo">Cliquez sur le graphique pour voir les détails d'un point</div>
-                        <div id="chartStats" style="margin-top: 10px; font-size: 14px; color: #666;"></div>
-                    </div>
-                </div>
-                
-                <div style="text-align: center; margin-top: 20px;">
-                    <button class="load-btn" onclick="loadWaterData()">
-                        🔄 Actualiser les données
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Liens externes -->
-            <a href="https://www.vigicrues.gouv.fr/station/V300002001" class="btn btn-warning" target="_blank">
-                🌊 Site Vigicrues Officiel
-            </a>
-            
+<div class="status-bar"><div class="status-dot"></div><span>SYSTÈME ACTIF</span><span>|</span><span id="statusDateTime"></span><span>|</span><span>MÉTROPOLE DE LYON — DIRECTION EAU</span></div>
+<div class="header"><div class="header-inner"><div class="header-brand"><div class="header-logo-mark">🛡️</div><div><div class="header-title">SURVEILLANCE DES DIGUES</div><div class="header-subtitle">Outil de patrouille — Auvergne-Rhône-Alpes</div></div></div><div class="header-meta"><div id="headerDate"></div><div id="headerTime"></div></div></div></div>
+<div class="container">
+<div class="section notif-banner"><div class="notif-banner-inner"><div class="notif-banner-text"><h3>🔔 Alertes de franchissement de seuils</h3><p>Surveillance automatique toutes les 5 minutes</p></div><button id="btnNotifications" class="notif-toggle-btn" onclick="toggleNotifications()">Activer</button></div></div>
+<div class="section"><div class="section-header"><span class="section-header-icon">📊</span><h2>SE Vaulx-en-Velin — Station Pont Morand</h2><span class="badge">V300002001</span></div><div class="section-body">
+<div class="water-level-panel" id="waterPanel1"><div class="level-label">Hauteur d'eau actuelle</div><div class="level-display"><div class="current-level" id="currentLevel">--</div><div class="level-unit">cm</div></div><div class="last-update" id="lastUpdate">Chargement en cours…</div></div>
+<div id="alertZone" style="display:none;"></div><div id="infoZone" style="display:none;"></div>
+<table class="thresholds-table"><thead><tr><th>Seuil</th><th>Valeur</th><th>Désignation</th></tr></thead><tbody>
+<tr><td><span class="threshold-swatch" style="background:#6B21A8"></span>Vigilance 1</td><td><strong>160 cm</strong></td><td style="color:#6B21A8">Surveillance renforcée</td></tr>
+<tr><td><span class="threshold-swatch" style="background:#B45309"></span>Vigilance 1bis</td><td><strong>280 cm</strong></td><td style="color:#B45309">Pré-alerte</td></tr>
+<tr><td><span class="threshold-swatch" style="background:#D97706"></span>Vigilance 2</td><td><strong>360 cm</strong></td><td style="color:#D97706">Vigilance</td></tr>
+<tr><td><span class="threshold-swatch" style="background:#EA580C"></span>Vigilance 3</td><td><strong>460 cm</strong></td><td style="color:#EA580C">Alerte — niveau de protection</td></tr>
+<tr><td><span class="threshold-swatch" style="background:#B91C1C"></span>Vigilance 4</td><td><strong>480 cm</strong></td><td style="color:#B91C1C">Alerte critique — niveau de danger</td></tr>
+</tbody></table>
+<canvas id="waterChart" class="chart-canvas" width="800" height="280"></canvas>
+<div id="chartInfo" class="chart-info" style="display:none;"><div id="clickInfo">Cliquez sur le graphique pour afficher les détails d'un point</div><div id="chartStats" style="margin-top:6px;"></div></div>
+<div style="margin-top:14px;text-align:center;"><button class="load-btn" onclick="loadWaterData()">↻ Actualiser les données</button></div>
+<div class="divider"></div>
+<a href="https://www.vigicrues.gouv.fr/station/V300002001" class="btn btn-warning" target="_blank"><span class="btn-icon">🌊</span> Vigicrues — Site officiel</a>
+</div></div>
+<div class="section"><div class="section-header"><span class="section-header-icon">📊</span><h2>SE Villeurbanne — Station Pont Morand</h2><span class="badge">V300002001</span></div><div class="section-body">
+<div class="water-level-panel" id="waterPanel2"><div class="level-label">Hauteur d'eau actuelle</div><div class="level-display"><div class="current-level" id="currentLevel2">--</div><div class="level-unit">cm</div></div><div class="last-update" id="lastUpdate2">Chargement en cours…</div></div>
+<div id="alertZone2" style="display:none;"></div><div id="infoZone2" style="display:none;"></div>
+<table class="thresholds-table"><thead><tr><th>Seuil</th><th>Valeur</th><th>Désignation</th></tr></thead><tbody>
+<tr><td><span class="threshold-swatch" style="background:#6B21A8"></span>Seuil 1 — préalerte</td><td><strong>400 cm</strong></td><td style="color:#6B21A8">Préalerte</td></tr>
+<tr><td><span class="threshold-swatch" style="background:#D97706"></span>Seuil 2 — alerte</td><td><strong>460 cm</strong></td><td style="color:#D97706">Alerte</td></tr>
+<tr><td><span class="threshold-swatch" style="background:#EA580C"></span>Seuil 3</td><td><strong>480 cm</strong></td><td style="color:#EA580C">Vigilance renforcée</td></tr>
+<tr><td><span class="threshold-swatch" style="background:#B91C1C"></span>Seuil 4 — Q200</td><td><strong>550 cm</strong></td><td style="color:#B91C1C">Niveau de protection Q200</td></tr>
+</tbody></table>
+<canvas id="waterChart2" class="chart-canvas" width="800" height="280"></canvas>
+<div id="chartInfo2" class="chart-info" style="display:none;"><div id="clickInfo2">Cliquez sur le graphique pour afficher les détails d'un point</div><div id="chartStats2" style="margin-top:6px;"></div></div>
+<div style="margin-top:14px;text-align:center;"><button class="load-btn" onclick="loadWaterData2()">↻ Actualiser les données</button></div>
+<div class="divider"></div>
+<a href="https://www.vigicrues.gouv.fr/station/V300002001" class="btn btn-warning" target="_blank"><span class="btn-icon">🌊</span> Vigicrues — Site officiel</a>
+</div></div>
+<div class="section"><div class="section-header"><span class="section-header-icon">🗺️</span><h2>Itinéraires préétablis</h2></div><div class="section-body">
+<div class="btn-row"><button class="btn btn-secondary" onclick="showItineraires('vaulx')"><span class="btn-icon">📍</span> SE Vaulx-en-Velin</button><button class="btn btn-secondary" onclick="showItineraires('villeurbanne')"><span class="btn-icon">📍</span> SE Villeurbanne</button></div>
+<div id="itinerairesContainer"></div>
+</div></div>
+<div class="section"><div class="section-header"><span class="section-header-icon">💧</span><h2>Cartes d'inondation</h2></div><div class="section-body">
+<div class="btn-row"><button class="btn btn-secondary" onclick="showCartesInondation('vaulx')"><span class="btn-icon">📍</span> SE Vaulx-en-Velin</button><button class="btn btn-secondary" onclick="showCartesInondation('villeurbanne')"><span class="btn-icon">📍</span> SE Villeurbanne</button></div>
+<div id="cartesInondationContainer"></div>
+</div></div>
 
-        </div>
-        
-        <!-- 1bis. Monitoring Station SE Villeurbanne -->
-        <div class="section">
-            <h2>📊 SE Villeurbanne - Station Pont Morand Lyon - Monitoring 24h</h2>
-            
-            <div class="water-level">
-                <div style="text-align: center;">
-                    <h3>💧 Hauteur d'eau actuelle</h3>
-                    <div id="waterDisplay2">
-                        <div class="current-level" id="currentLevel2">--</div>
-                        <div id="lastUpdate2" style="color: #666; font-size: 14px;">Chargement...</div>
-                    </div>
-                </div>
-                
-                <div id="alertZone2" style="display: none;"></div>
-                <div id="infoZone2" style="display: none;"></div>
-                
-                <!-- Légende des seuils pour Villeurbanne -->
-                <div class="thresholds-legend">
-                    <h4 style="margin-bottom: 10px;">📏 Seuils de surveillance</h4>
-                    <div class="threshold-item">
-                        <div class="threshold-color" style="background: #7B1FA2;"></div>
-                        <span>Seuil de vigilance 1 préalerte: 400 cm (4.00m)</span>
-                    </div>
-                    <div class="threshold-item">
-                        <div class="threshold-color" style="background: #F57F17;"></div>
-                        <span>Seuil 2 alerte: 460 cm (4.60m)</span>
-                    </div>
-                    <div class="threshold-item">
-                        <div class="threshold-color" style="background: #FF9800;"></div>
-                        <span>Seuil 3: 480 cm (4.80m)</span>
-                    </div>
-                    <div class="threshold-item">
-                        <div class="threshold-color" style="background: #D32F2F;"></div>
-                        <span>Seuil 4 niveau de protection Q200: 550 cm (5.50m)</span>
-                    </div>
-                </div>
-                
-                <!-- Graphique Canvas pour Villeurbanne -->
-                <div style="text-align: center;">
-                    <canvas id="waterChart2" class="chart-canvas" width="800" height="300"></canvas>
-                    <div id="chartInfo2" class="chart-info" style="display: none;">
-                        <div id="clickInfo2">Cliquez sur le graphique pour voir les détails d'un point</div>
-                        <div id="chartStats2" style="margin-top: 10px; font-size: 14px; color: #666;"></div>
-                    </div>
-                </div>
-                
-                <div style="text-align: center; margin-top: 20px;">
-                    <button class="load-btn" onclick="loadWaterData2()">
-                        🔄 Actualiser les données
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Liens externes -->
-            <a href="https://www.vigicrues.gouv.fr/station/V300002001" class="btn btn-warning" target="_blank">
-                🌊 Site Vigicrues Officiel
-            </a>
-            
+<div class="section"><div class="section-header"><span class="section-header-icon">🔔</span><h2>Alertes de seuils</h2></div><div class="section-body">
+<p style="color:var(--gm);margin-bottom:12px;font-size:13px;">Recevez une notification lorsqu'un seuil d'eau est franchi.</p>
+<button id="notificationBtn" class="btn btn-success" onclick="toggleNotifications()" style="width:100%;justify-content:center;"><span class="btn-icon">🔔</span> Activer les notifications</button>
+<div id="notificationStatus" class="notif-status"></div>
+</div></div>
+</div>
+<script>
+function updateClock(){var now=new Date(),opts={weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'};document.getElementById('headerDate').textContent=now.toLocaleDateString('fr-FR',opts).toUpperCase();document.getElementById('headerTime').textContent=now.toLocaleTimeString('fr-FR');document.getElementById('statusDateTime').textContent=now.toLocaleDateString('fr-FR')+' '+now.toLocaleTimeString('fr-FR');}
+updateClock();setInterval(updateClock,1000);
+var chartData=[];
+var thresholds=[{level:1.60,color:'#6B21A8',name:'Seuil 1',description:'Surveillance renforcée'},{level:2.80,color:'#B45309',name:'Seuil 1bis',description:'Pré-alerte'},{level:3.60,color:'#D97706',name:'Seuil 2',description:'Vigilance'},{level:4.60,color:'#EA580C',name:'Seuil 3',description:'Alerte'},{level:4.80,color:'#B91C1C',name:'Seuil 4',description:'Alerte critique'}];
+function getActiveThreshold(v){var a=null;thresholds.forEach(function(t){if(v>=t.level)a=t;});return a;}
+function showCurrentLevel(value,date,at){
+var lEl=document.getElementById('currentLevel'),uEl=document.getElementById('lastUpdate'),aEl=document.getElementById('alertZone'),iEl=document.getElementById('infoZone'),panel=document.getElementById('waterPanel1');
+lEl.textContent=(value*100).toFixed(1);uEl.textContent='Dernière mesure : '+new Date(date).toLocaleString('fr-FR');
+panel.className='water-level-panel';aEl.style.display='none';iEl.style.display='none';
+if(at){var css='seuil1';if(at.name==='Seuil 1bis')css='seuil1bis';else if(at.level===3.60)css='seuil2';else if(at.level===4.60)css='seuil3';else if(at.level===4.80)css='seuil4';
+panel.className+=' alert-'+css;aEl.className='alert-box '+css;aEl.innerHTML='⚠ '+at.name.toUpperCase()+' DÉPASSÉ — '+at.description+' ('+(value*100).toFixed(1)+' cm)';aEl.style.display='flex';}
+else{iEl.className='info-box';iEl.innerHTML='✔ Niveau normal — Aucun seuil dépassé ('+chartData.length+' mesures)';iEl.style.display='block';}}
+function drawChartBase(cv,ctx,W,H,P,gW,gH,minV,maxV,vR,minD,maxD,dR,tList,lbl){
+ctx.clearRect(0,0,W,H);ctx.fillStyle='#F7F9FC';ctx.fillRect(0,0,W,H);
+ctx.strokeStyle='#D1DCE9';ctx.lineWidth=1;
+for(var i=0;i<=6;i++){var y=P+gH*i/6;ctx.beginPath();ctx.moveTo(P,y);ctx.lineTo(W-P,y);ctx.stroke();ctx.fillStyle='#6B7F95';ctx.font='11px IBM Plex Mono,monospace';ctx.textAlign='right';ctx.fillText(((maxV-vR*i/6)*100).toFixed(0)+'cm',P-6,y+4);}
+tList.forEach(function(t){if(t.level<minV||t.level>maxV)return;var ty=P+gH-gH*(t.level-minV)/vR;ctx.strokeStyle=t.color;ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(P,ty);ctx.lineTo(W-P,ty);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=t.color;ctx.font='bold 10px IBM Plex Sans,sans-serif';ctx.textAlign='left';ctx.fillText(t.name+' — '+(t.level*100).toFixed(0)+'cm',P+6,ty-4);});
+ctx.strokeStyle='#003865';ctx.lineWidth=2;ctx.setLineDash([]);ctx.beginPath();ctx.moveTo(P,P);ctx.lineTo(P,H-P);ctx.lineTo(W-P,H-P);ctx.stroke();
+var step=Math.max(4*3600*1000,dR/6);for(var t2=minD;t2<=maxD;t2+=step){var tx=P+gW*(t2-minD)/dR,dt=new Date(t2);ctx.fillStyle='#6B7F95';ctx.font='10px IBM Plex Mono,monospace';ctx.textAlign='center';ctx.fillText(dt.getHours().toString().padStart(2,'0')+'h',tx,H-P+14);}
+ctx.fillStyle='#003865';ctx.font='bold 13px IBM Plex Sans,sans-serif';ctx.textAlign='center';ctx.fillText(lbl,W/2,20);}
+function drawChart(){
+if(!chartData.length)return;
+var cv=document.getElementById('waterChart'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height,P=60,gW=W-2*P,gH=H-2*P;
+var vals=chartData.map(function(d){return d.value;});
+var minV=Math.min.apply(null,vals),maxV=Math.max.apply(null,thresholds.map(function(t){return t.level;}).concat(vals))+0.2,vR=maxV-minV||0.5;
+var dates=chartData.map(function(d){return d.date.getTime();}),minD=Math.min.apply(null,dates),maxD=Math.max.apply(null,dates),dR=maxD-minD||1;
+drawChartBase(cv,ctx,W,H,P,gW,gH,minV,maxV,vR,minD,maxD,dR,thresholds,"SE Vaulx-en-Velin — V300002001 — Hauteur d'eau (24h–7j)");
+var sorted=chartData.slice().sort(function(a,b){return a.date-b.date;});
+ctx.strokeStyle='#005B9E';ctx.lineWidth=2.5;ctx.beginPath();sorted.forEach(function(d,i){var px=P+gW*(d.date.getTime()-minD)/dR,py=P+gH-gH*(d.value-minV)/vR;i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);});ctx.stroke();
+sorted.forEach(function(d){var px=P+gW*(d.date.getTime()-minD)/dR,py=P+gH-gH*(d.value-minV)/vR,at=getActiveThreshold(d.value);ctx.beginPath();ctx.arc(px,py,at?5:3.5,0,2*Math.PI);ctx.fillStyle=at?at.color:'#005B9E';ctx.fill();if(at){ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();}});
+var avg=vals.reduce(function(s,v){return s+v;},0)/vals.length,alerts=chartData.filter(function(d){return getActiveThreshold(d.value);}).length;
+document.getElementById('chartStats').textContent='N='+chartData.length+'  |  Min='+(Math.min.apply(null,vals)*100).toFixed(1)+'cm  |  Max='+(Math.max.apply(null,vals)*100).toFixed(1)+'cm  |  Moy='+(avg*100).toFixed(1)+'cm  |  Alertes='+alerts;
+document.getElementById('chartInfo').style.display='block';
+cv.onclick=function(ev){var r=cv.getBoundingClientRect(),cx=(ev.clientX-r.left)*(cv.width/r.width),cy=(ev.clientY-r.top)*(cv.height/r.height),best=null,bd=Infinity;sorted.forEach(function(d){var px=P+gW*(d.date.getTime()-minD)/dR,py=P+gH-gH*(d.value-minV)/vR,dist=Math.sqrt((cx-px)**2+(cy-py)**2);if(dist<bd&&dist<30){bd=dist;best=d;}});if(best){var at=getActiveThreshold(best.value);document.getElementById('clickInfo').textContent=best.date.toLocaleString('fr-FR')+'  |  '+(best.value*100).toFixed(1)+' cm'+(at?'  |  ⚠ '+at.name+' ('+at.description+')':'  |  ✔ Niveau normal');}};}
+function loadWaterData(){document.getElementById('currentLevel').textContent='…';document.getElementById('lastUpdate').textContent='Chargement en cours…';tryAPI(0,['https://hubeau.eaufrance.fr/api/v1/hydrometrie/observations_tr?code_entite=V300002001&format=json&size=48','https://hubeau.eaufrance.fr/api/v2/hydrometrie/obs_elab?code_entite=V300002001&format=json&size=48&grandeur_hydro=H','https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr?code_entite=V300002001&format=json&size=48']);}
+function tryAPI(idx,apis){if(idx>=apis.length){document.getElementById('currentLevel').textContent='—';document.getElementById('lastUpdate').textContent='Service temporairement indisponible';return;}fetch(apis[idx]).then(function(r){if(r.ok||r.status===206)return r.json();throw new Error();}).then(function(d){if(!d.data||!d.data.length)throw new Error();if(!processAPIData(d.data))tryAPI(idx+1,apis);}).catch(function(){tryAPI(idx+1,apis);});}
+function processAPIData(raw){chartData=[];var now=new Date(),cutoff=new Date(now-7*864e5);raw.forEach(function(item){var df=item.date_obs_elab||item.date_obs||item.date_observation,vf=item.resultat_obs_elab||item.resultat_obs||item.resultat_observation;if(!df||vf==null)return;var dt=new Date(df),v=parseFloat(vf);if(v>10)v/=1000;if(!isNaN(dt)&&!isNaN(v)&&v>0&&dt>=cutoff)chartData.push({date:dt,value:v});});if(!chartData.length)return false;chartData.sort(function(a,b){return b.date-a.date;});showCurrentLevel(chartData[0].value,chartData[0].date,getActiveThreshold(chartData[0].value));drawChart();return true;}
+var chartData2=[];
+var thresholds2=[{level:4.00,color:'#6B21A8',name:'Seuil 1 préalerte',description:'Préalerte'},{level:4.60,color:'#D97706',name:'Seuil 2 alerte',description:'Alerte'},{level:4.80,color:'#EA580C',name:'Seuil 3',description:'Vigilance renforcée'},{level:5.50,color:'#B91C1C',name:'Seuil 4 Q200',description:'Niveau de protection Q200'}];
+function getActiveThreshold2(v){var a=null;thresholds2.forEach(function(t){if(v>=t.level)a=t;});return a;}
+function showCurrentLevel2(value,date,at){
+var lEl=document.getElementById('currentLevel2'),uEl=document.getElementById('lastUpdate2'),aEl=document.getElementById('alertZone2'),iEl=document.getElementById('infoZone2'),panel=document.getElementById('waterPanel2');
+lEl.textContent=(value*100).toFixed(1);uEl.textContent='Dernière mesure : '+date.toLocaleString('fr-FR');
+panel.className='water-level-panel';aEl.style.display='none';iEl.style.display='none';
+if(at){var css='seuil1';if(at.level===4.60)css='seuil2';else if(at.level===4.80)css='seuil3';else if(at.level===5.50)css='seuil4';panel.className+=' alert-'+css;aEl.className='alert-box '+css;aEl.innerHTML='⚠ '+at.name.toUpperCase()+' — '+at.description+' ('+(value*100).toFixed(1)+' cm)';aEl.style.display='flex';}
+else{iEl.className='info-box';iEl.innerHTML='✔ Niveau normal — Aucune alerte active';iEl.style.display='block';}}
+function drawChart2(){
+if(!chartData2.length)return;
+var cv=document.getElementById('waterChart2'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height,P=60,gW=W-2*P,gH=H-2*P;
+var vals=chartData2.map(function(d){return d.value;});
+var minV=Math.min(Math.min.apply(null,vals),3.5),maxV=Math.max(Math.max.apply(null,vals.concat(thresholds2.map(function(t){return t.level;}))),6.0)+0.2,vR=maxV-minV;
+var dates=chartData2.map(function(d){return d.date.getTime();}),minD=Math.min.apply(null,dates),maxD=Math.max.apply(null,dates),dR=maxD-minD||1;
+drawChartBase(cv,ctx,W,H,P,gW,gH,minV,maxV,vR,minD,maxD,dR,thresholds2,"SE Villeurbanne — V300002001 — Hauteur d'eau (24h–7j)");
+var sorted=chartData2.slice().sort(function(a,b){return a.date-b.date;});
+ctx.strokeStyle='#005B9E';ctx.lineWidth=2.5;ctx.beginPath();sorted.forEach(function(d,i){var px=P+gW*(d.date.getTime()-minD)/dR,py=P+gH-gH*(d.value-minV)/vR;i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);});ctx.stroke();
+sorted.forEach(function(d){var px=P+gW*(d.date.getTime()-minD)/dR,py=P+gH-gH*(d.value-minV)/vR,at=getActiveThreshold2(d.value);ctx.beginPath();ctx.arc(px,py,at?5:3.5,0,2*Math.PI);ctx.fillStyle=at?at.color:'#005B9E';ctx.fill();if(at){ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();}});
+var avg=vals.reduce(function(s,v){return s+v;},0)/vals.length,alerts=chartData2.filter(function(d){return getActiveThreshold2(d.value);}).length;
+document.getElementById('chartStats2').textContent='N='+chartData2.length+'  |  Min='+(Math.min.apply(null,vals)*100).toFixed(1)+'cm  |  Max='+(Math.max.apply(null,vals)*100).toFixed(1)+'cm  |  Moy='+(avg*100).toFixed(1)+'cm  |  Alertes='+alerts;
+document.getElementById('chartInfo2').style.display='block';
+cv.onclick=function(ev){var r=cv.getBoundingClientRect(),cx=(ev.clientX-r.left)*(cv.width/r.width),cy=(ev.clientY-r.top)*(cv.height/r.height),best=null,bd=Infinity;sorted.forEach(function(d){var px=P+gW*(d.date.getTime()-minD)/dR,py=P+gH-gH*(d.value-minV)/vR,dist=Math.sqrt((cx-px)**2+(cy-py)**2);if(dist<bd&&dist<30){bd=dist;best=d;}});if(best){var at=getActiveThreshold2(best.value);document.getElementById('clickInfo2').textContent=best.date.toLocaleString('fr-FR')+'  |  '+(best.value*100).toFixed(1)+' cm'+(at?'  |  ⚠ '+at.name+' ('+at.description+')':'  |  ✔ Niveau normal');}};}
+function loadWaterData2(){document.getElementById('currentLevel2').textContent='…';document.getElementById('lastUpdate2').textContent='Chargement en cours…';tryAPI2(0,['https://hubeau.eaufrance.fr/api/v1/hydrometrie/observations_tr?code_entite=V300002001&format=json&size=48','https://hubeau.eaufrance.fr/api/v2/hydrometrie/obs_elab?code_entite=V300002001&format=json&size=48&grandeur_hydro=H','https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr?code_entite=V300002001&format=json&size=48']);}
+function tryAPI2(idx,apis){if(idx>=apis.length){document.getElementById('currentLevel2').textContent='—';document.getElementById('lastUpdate2').textContent='Service temporairement indisponible';return;}fetch(apis[idx]).then(function(r){if(r.ok||r.status===206)return r.json();throw new Error();}).then(function(d){if(!d.data||!d.data.length)throw new Error();if(!processAPIData2(d.data))tryAPI2(idx+1,apis);}).catch(function(){tryAPI2(idx+1,apis);});}
+function processAPIData2(raw){chartData2=[];var now=new Date(),cutoff=new Date(now-7*864e5);raw.forEach(function(item){var df=item.date_obs_elab||item.date_obs||item.date_observation,vf=item.resultat_obs_elab||item.resultat_obs||item.resultat_observation;if(!df||vf==null)return;var dt=new Date(df),v=parseFloat(vf);if(v>10)v/=1000;if(!isNaN(dt)&&!isNaN(v)&&v>0&&dt>=cutoff)chartData2.push({date:dt,value:v});});if(!chartData2.length)return false;chartData2.sort(function(a,b){return b.date-a.date;});showCurrentLevel2(chartData2[0].value,chartData2[0].date,getActiveThreshold2(chartData2[0].value));drawChart2();return true;}
 
-        </div>
-        
-        <!-- 2. Itinéraires -->
-        <div class="section">
-            <h2>🗺️ Itinéraires Préétablis</h2>
-            
-            <!-- Boutons de sélection des secteurs -->
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <button class="btn" style="flex: 1;" onclick="showItineraires('vaulx')">
-                    📍 SE Vaulx-en-Velin
-                </button>
-                <button class="btn" style="flex: 1;" onclick="showItineraires('villeurbanne')">
-                    📍 SE Villeurbanne
-                </button>
-            </div>
-            
-            <!-- Zone d'affichage des itinéraires -->
-            <div id="itinerairesContainer"></div>
-        </div>
-        
-        <!-- 3. Cartes d'inondation -->
-        <div class="section">
-            <h2>💧 Cartes d'inondation</h2>
-            
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <button class="btn" style="flex: 1;" onclick="showCartesInondation('vaulx')">
-                    📍 SE Vaulx-en-Velin
-                </button>
-                <button class="btn" style="flex: 1;" onclick="showCartesInondation('villeurbanne')">
-                    📍 SE Villeurbanne
-                </button>
-            </div>
-            
-            <!-- Zone d'affichage des cartes d'inondation -->
-            <div id="cartesInondationContainer"></div>
-        </div>
-        
-        <!-- 4. Déclaration désordre -->
-        <div class="section">
-            <h2>🚨 Déclaration désordre</h2>
-            
-            <button class="btn emergency-button" style="width: 100%; padding: 20px;" onclick="declareIncident()">
-                🚨 Déclaration Désordre 🚨
-            </button>
-            
-            <a href="https://docs.google.com/document/d/1YELhEVbEztXlUpoqyVt_sjs_rH-iF0TI/edit?usp=sharing&ouid=117931034611088760506&rtpof=true&sd=true" class="btn btn-warning" target="_blank">
-                📝 Modification de la déclaration d'incidents
-            </a>
-        </div>
-        
-        <!-- 5. Notifications -->
-        <div class="section">
-            <h2>🔔 Alertes de seuils</h2>
-            <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
-                Recevez une notification lorsqu'un seuil d'eau est franchi
-            </p>
-            
-            <button id="notificationBtn" class="btn btn-success" onclick="toggleNotifications()" style="width: 100%;">
-                🔔 Activer les notifications
-            </button>
-            
-            <div id="notificationStatus" style="margin-top: 15px; padding: 10px; border-radius: 8px; display: none; font-size: 14px;">
-            </div>
-        </div>
-    </div>
-
-    <!-- Script principal -->
-    <script>
-        var chartData = [];
-        
-        // Définition des 5 seuils avec leurs couleurs
-        var thresholds = [
-            { level: 1.60, color: '#7B1FA2', name: 'Seuil 1', description: 'Surveillance renforcée' },
-            { level: 2.80, color: '#F57F17', name: 'Seuil 1bis', description: 'Pré-alerte' },
-            { level: 3.60, color: '#F57F17', name: 'Seuil 2', description: 'Vigilance' },
-            { level: 4.60, color: '#FF9800', name: 'Seuil 3', description: 'Alerte' },
-            { level: 4.80, color: '#D32F2F', name: 'Seuil 4', description: 'Alerte critique' }
-        ];
-        
-        var canvas, ctx;
-        
-        function declareIncident() {
-            var now = new Date();
-            var incidentId = 'INC_' + now.getTime();
-            var incidentDate = now.toLocaleDateString('fr-FR');
-            var incidentTime = now.toLocaleTimeString('fr-FR');
-            
-            console.log('🚨 Déclaration incident:', incidentId);
-            
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {
-                        var gpsCoords = position.coords.latitude.toFixed(6) + ', ' + position.coords.longitude.toFixed(6);
-                        generateIncidentReport(incidentId, incidentDate, incidentTime, gpsCoords);
-                    },
-                    function(error) {
-                        console.log('Erreur GPS:', error);
-                        generateIncidentReport(incidentId, incidentDate, incidentTime, 'GPS non disponible');
-                    }
-                );
-            } else {
-                generateIncidentReport(incidentId, incidentDate, incidentTime, 'GPS non supporté');
-            }
-        }
-        
-        function generateIncidentReport(id, date, time, gps) {
-            var rapport = '🚨 RAPPORT D\'INCIDENT - PATROUILLE DES DIGUES\n';
-            rapport += '═══════════════════════════════════════════════\n\n';
-            rapport += '📋 INFORMATIONS AUTOMATIQUES\n';
-            rapport += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
-            rapport += '• ID Incident: ' + id + '\n';
-            rapport += '• Date: ' + date + '\n';
-            rapport += '• Heure: ' + time + '\n';
-            rapport += '• GPS: ' + gps + '\n';
-            rapport += '• Zone: Lyon - Région Auvergne-Rhône-Alpes\n';
-            rapport += '• Agent: Patrouilleur d\'astreinte\n\n';
-            rapport += '⚠️ DESCRIPTION DE L\'INCIDENT\n';
-            console.log('📋 Rapport généré pour:', id);
-            
-            // Essayer de copier dans le presse-papier
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(rapport).then(function() {
-                    console.log('✅ Rapport copié dans le presse-papier');
-                    alert('🚨 INCIDENT ENREGISTRÉ!\n\nID: ' + id + '\nDate: ' + date + '\nHeure: ' + time + '\nGPS: ' + gps + '\n\n📋 Rapport copié dans le presse-papier!\nLe document va s\'ouvrir - collez avec Ctrl+V');
-                }).catch(function(error) {
-                    console.log('❌ Erreur copie presse-papier:', error);
-                    alert('🚨 INCIDENT ENREGISTRÉ!\n\nID: ' + id + '\nDate: ' + date + '\nHeure: ' + time + '\nGPS: ' + gps + '\n\n⚠️ Copie automatique échouée\nLe document va s\'ouvrir');
-                });
-            } else {
-                alert('🚨 INCIDENT ENREGISTRÉ!\n\nID: ' + id + '\nDate: ' + date + '\nHeure: ' + time + '\nGPS: ' + gps + '\n\n📄 Le document va s\'ouvrir');
-            }
-            
-            // Ouvrir le document Google
-            setTimeout(function() {
-                window.open('https://docs.google.com/document/d/1noVZoJXTRZhPxUgIgMmXy1exlvEX4D_l1iKgFVYniVs/edit?usp=sharing', '_blank');
-            }, 1000);
-        }
-        
-        function getActiveThreshold(value) {
-            // Retourne le seuil le plus élevé qui est dépassé
-            var activeThreshold = null;
-            for (var i = 0; i < thresholds.length; i++) {
-                if (value >= thresholds[i].level) {
-                    if (!activeThreshold || thresholds[i].level > activeThreshold.level) {
-                        activeThreshold = thresholds[i];
-                    }
-                }
-            }
-            return activeThreshold;
-        }
-        
-        function showCurrentLevel(value, date, activeThreshold) {
-            var levelDiv = document.getElementById('currentLevel');
-            var updateDiv = document.getElementById('lastUpdate');
-            var alertDiv = document.getElementById('alertZone');
-            var infoDiv = document.getElementById('infoZone');
-            
-            var heightCm = (value * 100).toFixed(1);
-            levelDiv.innerHTML = heightCm + ' cm';
-            updateDiv.innerHTML = 'Dernière mesure: ' + new Date(date).toLocaleString('fr-FR');
-            
-            if (activeThreshold) {
-                // Appliquer la classe CSS correspondant au seuil
-                var cssClass = 'current-level';
-                if (activeThreshold.level === 1.60) cssClass += ' alert-seuil1';
-                else if (activeThreshold.level === 2.80 && activeThreshold.name === 'Seuil 1bis') cssClass += ' alert-seuil1bis';
-                else if (activeThreshold.level === 3.60 && activeThreshold.name === 'Seuil 2') cssClass += ' alert-seuil2';
-                else if (activeThreshold.level === 4.60) cssClass += ' alert-seuil3';
-                else if (activeThreshold.level === 4.80) cssClass += ' alert-seuil4';
-                
-                levelDiv.className = cssClass;
-                
-                // Afficher l'alerte correspondante
-                var alertClass = 'alert-box';
-                if (activeThreshold.level === 1.60) alertClass += ' seuil1';
-                else if (activeThreshold.level === 2.80 && activeThreshold.name === 'Seuil 1bis') alertClass += ' seuil1bis';
-                else if (activeThreshold.level === 3.60 && activeThreshold.name === 'Seuil 2') alertClass += ' seuil2';
-                else if (activeThreshold.level === 4.60) alertClass += ' seuil3';
-                else if (activeThreshold.level === 4.80) alertClass += ' seuil4';
-                
-                alertDiv.innerHTML = '🚨 ' + activeThreshold.name.toUpperCase() + ' DÉPASSÉ!<br>' + 
-                                   'Niveau: ' + heightCm + 'cm - ' + activeThreshold.description;
-                alertDiv.className = alertClass;
-                alertDiv.style.display = 'block';
-                infoDiv.style.display = 'none';
-            } else {
-                levelDiv.className = 'current-level';
-                alertDiv.style.display = 'none';
-                infoDiv.innerHTML = '✅ Station V300002001 - Surveillance continue<br>📊 ' + chartData.length + ' mesures disponibles<br>💧 Niveau normal - Aucun seuil dépassé';
-                infoDiv.className = 'info-box';
-                infoDiv.style.display = 'block';
-            }
-        }
-        
-        function drawChart() {
-            if (chartData.length === 0) return;
-            
-            canvas = document.getElementById('waterChart');
-            ctx = canvas.getContext('2d');
-            
-            var width = canvas.width;
-            var height = canvas.height;
-            var padding = 60;
-            var graphWidth = width - 2 * padding;
-            var graphHeight = height - 2 * padding;
-            
-            var values = chartData.map(function(item) { return item.value; });
-            var minValue = Math.min.apply(Math, values);
-            var maxValue = Math.max.apply(Math, values);
-            
-            // Étendre la plage pour inclure tous les seuils
-            var maxThreshold = Math.max.apply(Math, thresholds.map(function(t) { return t.level; }));
-            if (maxThreshold > maxValue) {
-                maxValue = maxThreshold + 0.2;
-            }
-            
-            var valueRange = maxValue - minValue;
-            if (valueRange < 0.5) {
-                var center = (minValue + maxValue) / 2;
-                minValue = center - 0.25;
-                maxValue = center + 0.25;
-                valueRange = 0.5;
-            }
-            
-            var dates = chartData.map(function(item) { return item.date.getTime(); });
-            var minDate = Math.min.apply(Math, dates);
-            var maxDate = Math.max.apply(Math, dates);
-            var dateRange = maxDate - minDate;
-            
-            ctx.clearRect(0, 0, width, height);
-            ctx.fillStyle = '#f8f9fa';
-            ctx.fillRect(0, 0, width, height);
-            
-            // Grille horizontale
-            ctx.strokeStyle = '#e9ecef';
-            ctx.lineWidth = 1;
-            
-            for (var i = 0; i <= 8; i++) {
-                var y = padding + (graphHeight * i / 8);
-                ctx.beginPath();
-                ctx.moveTo(padding, y);
-                ctx.lineTo(width - padding, y);
-                ctx.stroke();
-                
-                var value = maxValue - (valueRange * i / 8);
-                ctx.fillStyle = '#666';
-                ctx.font = '12px Arial';
-                ctx.textAlign = 'right';
-                ctx.fillText((value * 100).toFixed(0) + 'cm', padding - 5, y + 4);
-            }
-            
-            // Dessiner tous les seuils
-            for (var i = 0; i < thresholds.length; i++) {
-                var threshold = thresholds[i];
-                if (threshold.level >= minValue && threshold.level <= maxValue) {
-                    var thresholdY = padding + graphHeight - (graphHeight * (threshold.level - minValue) / valueRange);
-                    
-                    ctx.strokeStyle = threshold.color;
-                    ctx.lineWidth = 2;
-                    ctx.setLineDash([5, 5]);
-                    ctx.beginPath();
-                    ctx.moveTo(padding, thresholdY);
-                    ctx.lineTo(width - padding, thresholdY);
-                    ctx.stroke();
-                    ctx.setLineDash([]);
-                    
-                    ctx.fillStyle = threshold.color;
-                    ctx.font = 'bold 11px Arial';
-                    ctx.textAlign = 'left';
-                    var labelX = padding + 5 + (i * 120); // Décaler les étiquettes pour éviter les chevauchements
-                    if (labelX > width - padding - 100) labelX = padding + 5;
-                    ctx.fillText(threshold.name + ' (' + (threshold.level * 100).toFixed(0) + 'cm)', labelX, thresholdY - 5);
-                }
-            }
-            
-            // Grille verticale (heures)
-            if (dateRange > 0) {
-                var fourHours = 4 * 60 * 60 * 1000;
-                var timeStep = Math.max(fourHours, dateRange / 6);
-                
-                for (var time = minDate; time <= maxDate; time += timeStep) {
-                    var x = padding + (graphWidth * (time - minDate) / dateRange);
-                    ctx.strokeStyle = '#e9ecef';
-                    ctx.lineWidth = 1;
-                    ctx.beginPath();
-                    ctx.moveTo(x, padding);
-                    ctx.lineTo(x, height - padding);
-                    ctx.stroke();
-                    
-                    var date = new Date(time);
-                    ctx.fillStyle = '#666';
-                    ctx.font = '11px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.fillText(date.getHours().toString().padStart(2, '0') + 'h', x, height - padding + 15);
-                }
-            }
-            
-            // Courbe principale
-            ctx.strokeStyle = '#667eea';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            
-            for (var i = 0; i < chartData.length; i++) {
-                var item = chartData[i];
-                var x = dateRange > 0 ? padding + (graphWidth * (item.date.getTime() - minDate) / dateRange) : padding + graphWidth / 2;
-                var y = padding + graphHeight - (graphHeight * (item.value - minValue) / valueRange);
-                
-                if (i === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
-                }
-            }
-            ctx.stroke();
-            
-            // Points sur la courbe avec couleurs selon les seuils
-            for (var i = 0; i < chartData.length; i++) {
-                var item = chartData[i];
-                var x = dateRange > 0 ? padding + (graphWidth * (item.date.getTime() - minDate) / dateRange) : padding + graphWidth / 2;
-                var y = padding + graphHeight - (graphHeight * (item.value - minValue) / valueRange);
-                
-                var activeThreshold = getActiveThreshold(item.value);
-                var pointColor = activeThreshold ? activeThreshold.color : '#667eea';
-                var pointSize = activeThreshold ? 6 : 4;
-                
-                ctx.fillStyle = pointColor;
-                ctx.beginPath();
-                ctx.arc(x, y, pointSize, 0, 2 * Math.PI);
-                ctx.fill();
-                
-                // Bordure blanche pour les points d'alerte
-                if (activeThreshold) {
-                    ctx.strokeStyle = 'white';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                }
-            }
-            
-            // Titre du graphique
-            ctx.fillStyle = '#2c3e50';
-            ctx.font = 'bold 16px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('SE Vaulx-en-Velin - Station V300002001 - Hauteur d\'eau avec seuils', width / 2, 25);
-            
-            // Statistiques
-            var avgValue = values.reduce(function(sum, val) { return sum + val; }, 0) / values.length;
-            var activePoints = chartData.filter(function(item) { return getActiveThreshold(item.value); }).length;
-            
-            var stats = 'Points: ' + chartData.length + 
-                       ' | Min: ' + (minValue * 100).toFixed(1) + 'cm' +
-                       ' | Max: ' + (maxValue * 100).toFixed(1) + 'cm' +
-                       ' | Moyenne: ' + (avgValue * 100).toFixed(1) + 'cm' +
-                       ' | Alertes: ' + activePoints;
-            
-            document.getElementById('chartStats').innerHTML = stats;
-            document.getElementById('chartInfo').style.display = 'block';
-            
-            // Interaction clic sur le graphique
-            canvas.onclick = function(event) {
-                var rect = canvas.getBoundingClientRect();
-                var scaleX = canvas.width / rect.width;
-                var scaleY = canvas.height / rect.height;
-                var x = (event.clientX - rect.left) * scaleX;
-                var y = (event.clientY - rect.top) * scaleY;
-                
-                var closestPoint = null;
-                var minDistance = Infinity;
-                
-                for (var i = 0; i < chartData.length; i++) {
-                    var item = chartData[i];
-                    var pointX = dateRange > 0 ? padding + (graphWidth * (item.date.getTime() - minDate) / dateRange) : padding + graphWidth / 2;
-                    var pointY = padding + graphHeight - (graphHeight * (item.value - minValue) / valueRange);
-                    
-                    var distance = Math.sqrt(Math.pow(x - pointX, 2) + Math.pow(y - pointY, 2));
-                    
-                    if (distance < minDistance && distance < 30) {
-                        minDistance = distance;
-                        closestPoint = item;
-                    }
-                }
-                
-                if (closestPoint) {
-                    var activeThreshold = getActiveThreshold(closestPoint.value);
-                    var info = '📊 ' + closestPoint.date.toLocaleString('fr-FR') + 
-                              ' | Hauteur: ' + (closestPoint.value * 100).toFixed(1) + 'cm';
-                    
-                    if (activeThreshold) {
-                        info += ' | 🚨 ' + activeThreshold.name + ' (' + activeThreshold.description + ')';
-                    } else {
-                        info += ' | ✅ Niveau normal';
-                    }
-                    
-                    document.getElementById('clickInfo').innerHTML = info;
-                }
-            };
-        }
-        
-        function loadWaterData() {
-            document.getElementById('currentLevel').innerHTML = '🔄';
-            document.getElementById('lastUpdate').innerHTML = 'Chargement en cours...';
-            
-            var apis = [
-                'https://hubeau.eaufrance.fr/api/v1/hydrometrie/observations_tr?code_entite=V300002001&format=json&size=48',
-                'https://hubeau.eaufrance.fr/api/v2/hydrometrie/obs_elab?code_entite=V300002001&format=json&size=48&grandeur_hydro=H',
-                'https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr?code_entite=V300002001&format=json&size=48'
-            ];
-            
-            tryAPI(0, apis);
-        }
-        
-        function tryAPI(index, apis) {
-            if (index >= apis.length) {
-                document.getElementById('currentLevel').innerHTML = '❌';
-                document.getElementById('lastUpdate').innerHTML = 'Service temporairement indisponible';
-                return;
-            }
-            
-            var apiUrl = apis[index];
-            
-            fetch(apiUrl)
-                .then(function(response) {
-                    if (response.status === 200 || response.status === 206) {
-                        return response.json();
-                    }
-                    throw new Error('HTTP ' + response.status);
-                })
-                .then(function(data) {
-                    if (!data.data || !Array.isArray(data.data) || data.data.length === 0) {
-                        throw new Error('Pas de données');
-                    }
-                    
-                    var success = processAPIData(data.data);
-                    if (!success) {
-                        tryAPI(index + 1, apis);
-                    }
-                })
-                .catch(function(error) {
-                    tryAPI(index + 1, apis);
-                });
-        }
-        
-        function processAPIData(rawData) {
-            chartData = [];
-            var now = new Date();
-            var sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
-            
-            for (var i = 0; i < rawData.length; i++) {
-                var item = rawData[i];
-                
-                var dateField = item.date_obs_elab || item.date_obs || item.date_observation;
-                var valueField = item.resultat_obs_elab || item.resultat_obs || item.resultat_observation;
-                
-                if (dateField && valueField !== undefined && valueField !== null) {
-                    var dateObj = new Date(dateField);
-                    var valueNum = parseFloat(valueField);
-                    
-                    if (valueNum > 10) {
-                        valueNum = valueNum / 1000;
-                    }
-                    
-                    if (!isNaN(dateObj.getTime()) && !isNaN(valueNum) && valueNum > 0 && dateObj >= sevenDaysAgo) {
-                        chartData.push({
-                            date: dateObj,
-                            value: valueNum,
-                            station: 'V300002001'
-                        });
-                    }
-                }
-            }
-            
-            if (chartData.length === 0) {
-                return false;
-            }
-            
-            chartData.sort(function(a, b) { return b.date - a.date; });
-            
-            var latest = chartData[0];
-            var activeThreshold = getActiveThreshold(latest.value);
-            
-            showCurrentLevel(latest.value, latest.date, activeThreshold);
-            drawChart();
-            
-            return true;
-        }
-        
-        // ============================================
-        // GRAPHIQUE 2 - SE VILLEURBANNE
-        // ============================================
-        
-        var chartData2 = [];
-        
-        // Définition des seuils pour Villeurbanne
-        var thresholds2 = [
-            { level: 4.00, color: '#7B1FA2', name: 'Seuil 1 préalerte', description: 'Préalerte' },
-            { level: 4.60, color: '#F57F17', name: 'Seuil 2 alerte', description: 'Alerte' },
-            { level: 4.80, color: '#FF9800', name: 'Seuil 3', description: 'Vigilance renforcée' },
-            { level: 5.50, color: '#D32F2F', name: 'Seuil 4 Q200', description: 'Niveau de protection Q200' }
-        ];
-        
-        var canvas2, ctx2;
-        
-        function getActiveThreshold2(value) {
-            var activeThreshold = null;
-            for (var i = 0; i < thresholds2.length; i++) {
-                if (value >= thresholds2[i].level) {
-                    activeThreshold = thresholds2[i];
-                }
-            }
-            return activeThreshold;
-        }
-        
-        function showCurrentLevel2(value, date, activeThreshold) {
-            var levelText = (value * 100).toFixed(1) + ' cm';
-            var dateText = date.toLocaleString('fr-FR');
-            
-            document.getElementById('currentLevel2').innerHTML = levelText;
-            document.getElementById('lastUpdate2').innerHTML = '📅 ' + dateText;
-            
-            var alertZone = document.getElementById('alertZone2');
-            var infoZone = document.getElementById('infoZone2');
-            
-            if (activeThreshold) {
-                var className = 'seuil1';
-                if (activeThreshold.level === 4.60) className = 'seuil2';
-                else if (activeThreshold.level === 4.80) className = 'seuil3';
-                else if (activeThreshold.level === 5.50) className = 'seuil4';
-                
-                alertZone.className = 'alert-box ' + className;
-                alertZone.innerHTML = '🚨 ' + activeThreshold.name + ': ' + activeThreshold.description;
-                alertZone.style.display = 'block';
-                infoZone.style.display = 'none';
-                
-                document.getElementById('currentLevel2').className = 'current-level alert-' + className;
-            } else {
-                alertZone.style.display = 'none';
-                infoZone.className = 'info-box';
-                infoZone.innerHTML = '✅ Niveau normal - Aucune alerte';
-                infoZone.style.display = 'block';
-                document.getElementById('currentLevel2').className = 'current-level';
-            }
-        }
-        
-        function drawChart2() {
-            canvas2 = document.getElementById('waterChart2');
-            if (!canvas2) return;
-            
-            ctx2 = canvas2.getContext('2d');
-            var width = canvas2.width;
-            var height = canvas2.height;
-            var padding = 60;
-            
-            ctx2.clearRect(0, 0, width, height);
-            
-            if (chartData2.length === 0) return;
-            
-            var values = chartData2.map(function(item) { return item.value; });
-            var dates = chartData2.map(function(item) { return item.date; });
-            var minValue = Math.min.apply(null, values);
-            var maxValue = Math.max.apply(null, values);
-            var minDate = Math.min.apply(null, dates.map(function(d) { return d.getTime(); }));
-            var maxDate = Math.max.apply(null, dates.map(function(d) { return d.getTime(); }));
-            
-            minValue = Math.min(minValue, 3.5);
-            maxValue = Math.max(maxValue, 6.0);
-            
-            var valueRange = maxValue - minValue;
-            var dateRange = maxDate - minDate;
-            var graphWidth = width - 2 * padding;
-            var graphHeight = height - 2 * padding;
-            
-            ctx2.fillStyle = '#f8f9fa';
-            ctx2.fillRect(0, 0, width, height);
-            
-            // Dessiner les zones de seuils
-            for (var i = 0; i < thresholds2.length; i++) {
-                var threshold = thresholds2[i];
-                if (threshold.level >= minValue && threshold.level <= maxValue) {
-                    var y = padding + graphHeight - (graphHeight * (threshold.level - minValue) / valueRange);
-                    ctx2.strokeStyle = threshold.color;
-                    ctx2.lineWidth = 2;
-                    ctx2.setLineDash([5, 5]);
-                    ctx2.beginPath();
-                    ctx2.moveTo(padding, y);
-                    ctx2.lineTo(width - padding, y);
-                    ctx2.stroke();
-                    ctx2.setLineDash([]);
-                    
-                    ctx2.fillStyle = threshold.color;
-                    ctx2.font = '11px Arial';
-                    ctx2.textAlign = 'right';
-                    ctx2.fillText((threshold.level * 100) + 'cm', padding - 5, y + 4);
-                }
-            }
-            
-            // Axes
-            ctx2.strokeStyle = '#666';
-            ctx2.lineWidth = 2;
-            ctx2.beginPath();
-            ctx2.moveTo(padding, padding);
-            ctx2.lineTo(padding, height - padding);
-            ctx2.lineTo(width - padding, height - padding);
-            ctx2.stroke();
-            
-            // Dessiner la courbe
-            ctx2.strokeStyle = '#1976d2';
-            ctx2.lineWidth = 2.5;
-            ctx2.beginPath();
-            
-            var sortedData = chartData2.slice().sort(function(a, b) { return a.date - b.date; });
-            
-            for (var i = 0; i < sortedData.length; i++) {
-                var item = sortedData[i];
-                var x = dateRange > 0 ? padding + (graphWidth * (item.date.getTime() - minDate) / dateRange) : padding + graphWidth / 2;
-                var y = padding + graphHeight - (graphHeight * (item.value - minValue) / valueRange);
-                
-                if (i === 0) {
-                    ctx2.moveTo(x, y);
-                } else {
-                    ctx2.lineTo(x, y);
-                }
-            }
-            ctx2.stroke();
-            
-            // Points
-            for (var i = 0; i < sortedData.length; i++) {
-                var item = sortedData[i];
-                var x = dateRange > 0 ? padding + (graphWidth * (item.date.getTime() - minDate) / dateRange) : padding + graphWidth / 2;
-                var y = padding + graphHeight - (graphHeight * (item.value - minValue) / valueRange);
-                
-                var activeThreshold = getActiveThreshold2(item.value);
-                ctx2.fillStyle = activeThreshold ? activeThreshold.color : '#1976d2';
-                
-                ctx2.beginPath();
-                ctx2.arc(x, y, 4, 0, 2 * Math.PI);
-                ctx2.fill();
-                ctx2.strokeStyle = '#fff';
-                ctx2.lineWidth = 1.5;
-                ctx2.stroke();
-            }
-            
-            // Titre
-            ctx2.fillStyle = '#2c3e50';
-            ctx2.font = 'bold 16px Arial';
-            ctx2.textAlign = 'center';
-            ctx2.fillText('SE Villeurbanne - Station V300002001 - Hauteur d\'eau avec seuils', width / 2, 25);
-            
-            // Statistiques
-            var avgValue = values.reduce(function(sum, val) { return sum + val; }, 0) / values.length;
-            var activePoints = chartData2.filter(function(item) { return getActiveThreshold2(item.value); }).length;
-            
-            var stats = 'Points: ' + chartData2.length + 
-                       ' | Min: ' + (minValue * 100).toFixed(1) + 'cm' +
-                       ' | Max: ' + (maxValue * 100).toFixed(1) + 'cm' +
-                       ' | Moyenne: ' + (avgValue * 100).toFixed(1) + 'cm' +
-                       ' | Alertes: ' + activePoints;
-            
-            document.getElementById('chartStats2').innerHTML = stats;
-            document.getElementById('chartInfo2').style.display = 'block';
-            
-            // Interaction clic
-            canvas2.onclick = function(event) {
-                var rect = canvas2.getBoundingClientRect();
-                var scaleX = canvas2.width / rect.width;
-                var scaleY = canvas2.height / rect.height;
-                var x = (event.clientX - rect.left) * scaleX;
-                var y = (event.clientY - rect.top) * scaleY;
-                
-                var closestPoint = null;
-                var minDistance = Infinity;
-                
-                for (var i = 0; i < chartData2.length; i++) {
-                    var item = chartData2[i];
-                    var pointX = dateRange > 0 ? padding + (graphWidth * (item.date.getTime() - minDate) / dateRange) : padding + graphWidth / 2;
-                    var pointY = padding + graphHeight - (graphHeight * (item.value - minValue) / valueRange);
-                    
-                    var distance = Math.sqrt(Math.pow(x - pointX, 2) + Math.pow(y - pointY, 2));
-                    
-                    if (distance < minDistance && distance < 30) {
-                        minDistance = distance;
-                        closestPoint = item;
-                    }
-                }
-                
-                if (closestPoint) {
-                    var activeThreshold = getActiveThreshold2(closestPoint.value);
-                    var info = '📊 ' + closestPoint.date.toLocaleString('fr-FR') + 
-                              ' | Hauteur: ' + (closestPoint.value * 100).toFixed(1) + 'cm';
-                    
-                    if (activeThreshold) {
-                        info += ' | 🚨 ' + activeThreshold.name + ' (' + activeThreshold.description + ')';
-                    } else {
-                        info += ' | ✅ Niveau normal';
-                    }
-                    
-                    document.getElementById('clickInfo2').innerHTML = info;
-                }
-            };
-        }
-        
-        function loadWaterData2() {
-            document.getElementById('currentLevel2').innerHTML = '🔄';
-            document.getElementById('lastUpdate2').innerHTML = 'Chargement en cours...';
-            
-            var apis = [
-                'https://hubeau.eaufrance.fr/api/v1/hydrometrie/observations_tr?code_entite=V300002001&format=json&size=48',
-                'https://hubeau.eaufrance.fr/api/v2/hydrometrie/obs_elab?code_entite=V300002001&format=json&size=48&grandeur_hydro=H',
-                'https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr?code_entite=V300002001&format=json&size=48'
-            ];
-            
-            tryAPI2(0, apis);
-        }
-        
-        function tryAPI2(index, apis) {
-            if (index >= apis.length) {
-                document.getElementById('currentLevel2').innerHTML = '❌';
-                document.getElementById('lastUpdate2').innerHTML = 'Service temporairement indisponible';
-                return;
-            }
-            
-            var apiUrl = apis[index];
-            
-            fetch(apiUrl)
-                .then(function(response) {
-                    if (response.status === 200 || response.status === 206) {
-                        return response.json();
-                    }
-                    throw new Error('HTTP ' + response.status);
-                })
-                .then(function(data) {
-                    if (!data.data || !Array.isArray(data.data) || data.data.length === 0) {
-                        throw new Error('Pas de données');
-                    }
-                    
-                    var success = processAPIData2(data.data);
-                    if (!success) {
-                        tryAPI2(index + 1, apis);
-                    }
-                })
-                .catch(function(error) {
-                    tryAPI2(index + 1, apis);
-                });
-        }
-        
-        function processAPIData2(rawData) {
-            chartData2 = [];
-            var now = new Date();
-            var sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
-            
-            for (var i = 0; i < rawData.length; i++) {
-                var item = rawData[i];
-                
-                var dateField = item.date_obs_elab || item.date_obs || item.date_observation;
-                var valueField = item.resultat_obs_elab || item.resultat_obs || item.resultat_observation;
-                
-                if (dateField && valueField !== undefined && valueField !== null) {
-                    var dateObj = new Date(dateField);
-                    var valueNum = parseFloat(valueField);
-                    
-                    if (valueNum > 10) {
-                        valueNum = valueNum / 1000;
-                    }
-                    
-                    if (!isNaN(dateObj.getTime()) && !isNaN(valueNum) && valueNum > 0 && dateObj >= sevenDaysAgo) {
-                        chartData2.push({
-                            date: dateObj,
-                            value: valueNum,
-                            station: 'V300002001'
-                        });
-                    }
-                }
-            }
-            
-            if (chartData2.length === 0) {
-                return false;
-            }
-            
-            chartData2.sort(function(a, b) { return b.date - a.date; });
-            
-            var latest = chartData2[0];
-            var activeThreshold = getActiveThreshold2(latest.value);
-            
-            showCurrentLevel2(latest.value, latest.date, activeThreshold);
-            drawChart2();
-            
-            return true;
-        }
-        
-        // ============================================
-        // FIN GRAPHIQUE 2
-        // ============================================
-        
-        // Variable globale pour suivre le secteur actuellement affiché
-        var secteurActif = null;
-        
-        // Fonction pour afficher les itinéraires selon le secteur
-        function showItineraires(secteur) {
-            var container = document.getElementById('itinerairesContainer');
-            
-            // Si on clique sur le même secteur, on rétracte la liste
-            if (secteurActif === secteur) {
-                container.style.opacity = '0';
-                setTimeout(function() {
-                    container.innerHTML = '';
-                    container.style.opacity = '1';
-                }, 300);
-                secteurActif = null;
-                return;
-            }
-            
-            // Sinon, on affiche le nouveau secteur
-            secteurActif = secteur;
-            
-            var itineraires = {
-                vaulx: [
-                    { 
-                        nom: "Les eaux bleues", 
-                        url: "https://www.google.com/maps/d/u/2/edit?mid=1xuvjlfYmt7UZRE7ge-LNNPdcJEYxIm4&usp=sharing",
-                        fiche: "https://docs.google.com/spreadsheets/d/12DId6UUQmEeJo35bNyJqwNoKj0v3Gk6O/edit?usp=sharing&ouid=117931034611088760506&rtpof=true&sd=true"
-                    },
-                    { 
-                        nom: "Digue Duclos", 
-                        url: "https://www.google.com/maps/d/u/2/edit?mid=19Q9OWRfZO9Zc9NJInPFjtgtJPzGFfbk&usp=sharing",
-                        fiche: "https://docs.google.com/spreadsheets/d/1Q0aAIMGfpZGkZhjGI4A8SxfvUFbqQ3Nt/edit?usp=sharing&ouid=117931034611088760506&rtpof=true&sd=true"
-                    },
-                    { 
-                        nom: "Digue St Jean", 
-                        url: "https://www.google.com/maps/d/u/2/edit?mid=1Gr9am_UsQsmUgVEceA6UrlQLQcLhc0E&usp=sharing",
-                        fiche: "https://docs.google.com/spreadsheets/d/12r3N5idjDlybhIREzg9BRDzeDDgg19Nd/edit?usp=sharing&ouid=117931034611088760506&rtpof=true&sd=true"
-                    },
-                    { 
-                        nom: "A42 – Circuit C", 
-                        url: "https://www.google.com/maps/d/u/2/edit?mid=1mD_dqfH4oC_-9qsjT1hGWWzekj_4T1Q&usp=sharing",
-                        fiche: "https://drive.google.com/file/d/1_CZ8kFv-VkRghHEZY0FK58O6MI7boNgI/view?usp=sharing"
-                    },
-                    { 
-                        nom: "A42 – Circuit D", 
-                        url: "https://www.google.com/maps/d/u/2/edit?mid=1OjoIxd6LZXW_iMYzVYTb7wRkBMavYzQ&usp=sharing",
-                        fiche: "https://drive.google.com/file/d/1UMjMurwbv7efatiLdLXVLnqZhw5FDrAi/view?usp=sharing"
-                    },
-                    { 
-                        nom: "RN346 – Circuit B", 
-                        url: "https://www.google.com/maps/d/u/2/edit?mid=1o6Zxd64BSOSE07IeDYvy0Gh-whveLc4&usp=sharing",
-                        fiche: "https://drive.google.com/file/d/1Szs6IxsQPF1GVFpTQuB7Ndbi7QXNHXSY/view?usp=sharing"
-                    },
-                    { 
-                        nom: "RN346 – Circuit A", 
-                        url: "https://www.google.com/maps/d/u/2/edit?mid=1eUp178SU_qUIVpgVqzdEy97UzShjaik&usp=sharing",
-                        fiche: "https://drive.google.com/file/d/1klNfp1ywLQO5xfU8Rak4dTYIQewgIZtS/view?usp=sharing"
-                    }
-                ],
-                villeurbanne: [
-                    { 
-                        nom: "Laurent Bonnevay", 
-                        url: "https://www.google.com/maps/d/u/2/edit?mid=1Zxah_iusW28Dr8_OpF6WjlGid1BZ7Qo&usp=sharing",
-                        fiche: "https://drive.google.com/file/d/1ZAB-aq2ei8bjuPq824ARaZvp0yDgG_cx/view?usp=sharing"
-                    }
-                ]
-            };
-            
-            var container = document.getElementById('itinerairesContainer');
-            var liste = itineraires[secteur];
-            var html = '';
-            
-            // Générer les boutons pour chaque parcours avec leur fiche de visite
-            for (var i = 0; i < liste.length; i++) {
-                var parcours = liste[i];
-                // Convertir l'URL d'édition en URL de visualisation pour mobile
-                var urlViewer = parcours.url.replace('/edit?', '/viewer?');
-                
-                // Bouton de l'itinéraire
-                html += '<a href="' + urlViewer + '" class="btn btn-secondary" target="_blank" style="margin-bottom: 5px;">';
-                html += '🗺️ ' + (i + 1) + '. ' + parcours.nom;
-                html += '</a>';
-                
-                // Bouton de la fiche de visite juste en dessous
-                html += '<a href="' + parcours.fiche + '" class="btn btn-success" target="_blank" style="margin-bottom: 20px; font-size: 14px;">';
-                html += '📋 Fiche de visite - ' + parcours.nom;
-                html += '</a>';
-            }
-            
-            // Afficher avec animation
-            container.style.opacity = '0';
-            container.innerHTML = html;
-            setTimeout(function() {
-                container.style.transition = 'opacity 0.3s ease';
-                container.style.opacity = '1';
-            }, 50);
-        }
-        
-        // Variable globale pour suivre le secteur des cartes d'inondation actuellement affiché
-        var secteurCartesActif = null;
-        
-        // Fonction pour afficher les cartes d'inondation selon le secteur
-        function showCartesInondation(secteur) {
-            var container = document.getElementById('cartesInondationContainer');
-            
-            // Si on clique sur le même secteur, on rétracte la liste
-            if (secteurCartesActif === secteur) {
-                container.style.opacity = '0';
-                setTimeout(function() {
-                    container.innerHTML = '';
-                    container.style.opacity = '1';
-                }, 300);
-                secteurCartesActif = null;
-                return;
-            }
-            
-            // Sinon, on affiche le nouveau secteur
-            secteurCartesActif = secteur;
-            
-            var cartes = {
-                vaulx: [
-                    { nom: "Q30", url: "https://drive.google.com/file/d/1cXbRCTHWeMID3k_LS8zpnNBftejYnRlO/view?usp=sharing" },
-                    { nom: "Q50", url: "https://drive.google.com/file/d/11ZjqdhuYC0nwuhMxEWyWmOX49PuTSelc/view?usp=sharing" },
-                    { nom: "Q100", url: "https://drive.google.com/file/d/1yusir_NnZtxbvRH6tBYmkhCY4KaNlno0/view?usp=sharing" },
-                    { nom: "Q200", url: "https://drive.google.com/file/d/139aupDKrJroJonY2-P0Apefs0WAuX87n/view?usp=sharing" }
-                ],
-                villeurbanne: [
-                    { nom: "Carte 1 - Villeurbanne", url: "https://drive.google.com/file/d/1wded4yDG601TTAJqpN0I1ekNENAcEJo2/view?usp=sharing" },
-                    { nom: "Carte 2 - Villeurbanne", url: "https://drive.google.com/file/d/1yBRJCV8_zKyvvMREIm-lveomHlPErH-G/view?usp=sharing" }
-                ]
-            };
-            
-            var liste = cartes[secteur];
-            var html = '';
-            
-            // Générer les boutons pour chaque carte
-            for (var i = 0; i < liste.length; i++) {
-                var carte = liste[i];
-                html += '<a href="' + carte.url + '" class="btn btn-secondary" target="_blank" style="margin-bottom: 10px;">';
-                html += '💧 ' + (i + 1) + '. ' + carte.nom;
-                html += '</a>';
-            }
-            
-            // Afficher avec animation
-            container.style.opacity = '0';
-            container.innerHTML = html;
-            setTimeout(function() {
-                container.style.transition = 'opacity 0.3s ease';
-                container.style.opacity = '1';
-            }, 50);
-        }
-        
-        // Variables pour le suivi des seuils
-        var dernierSeuilVaulx = null;
-        var dernierSeuilVilleurbanne = null;
-        var notificationsActivees = false;
-        
-        // Fonction pour activer/désactiver les notifications
-        function toggleNotifications() {
-            var btn = document.getElementById('btnNotifications');
-            
-            if (!('Notification' in window)) {
-                alert('❌ Votre navigateur ne supporte pas les notifications');
-                return;
-            }
-            
-            if (Notification.permission === 'denied') {
-                alert('❌ Les notifications ont été bloquées. Veuillez les autoriser dans les paramètres de votre navigateur.');
-                return;
-            }
-            
-            if (!notificationsActivees) {
-                Notification.requestPermission().then(function(permission) {
-                    if (permission === 'granted') {
-                        notificationsActivees = true;
-                        btn.innerHTML = '✅ Activées';
-                        btn.style.background = '#00b894';
-                        btn.style.color = 'white';
-                        console.log('✅ Notifications activées');
-                        // Notification de confirmation
-                        new Notification('🚨 Surveillance Digue', {
-                            body: 'Notifications activées ! Vous serez alerté en cas de franchissement de seuil.\n⏰ Vérification automatique toutes les 15 minutes.',
-                            icon: 'icon-192.png',
-                            badge: 'icon-192.png'
-                        });
-                    } else {
-                        alert('❌ Permission refusée pour les notifications');
-                    }
-                });
-            } else {
-                notificationsActivees = false;
-                btn.innerHTML = 'Activer';
-                btn.style.background = 'white';
-                btn.style.color = '#667eea';
-                console.log('🔕 Notifications désactivées');
-            }
-        }
-        
-        // Mettre à jour le bouton au chargement
-        function mettreAJourBoutonNotifications() {
-            var btn = document.getElementById('btnNotifications');
-            if (Notification.permission === 'granted' && notificationsActivees) {
-                btn.innerHTML = '✅ Activées';
-                btn.style.background = '#00b894';
-                btn.style.color = 'white';
-            } else {
-                btn.innerHTML = 'Activer';
-                btn.style.background = 'white';
-                btn.style.color = '#667eea';
-            }
-        }
-        
-        // Demander la permission pour les notifications
-        function demanderPermissionNotifications() {
-            if ('Notification' in window && Notification.permission === 'default') {
-                Notification.requestPermission().then(function(permission) {
-                    if (permission === 'granted') {
-                        notificationsActivees = true;
-                        console.log('✅ Notifications activées');
-                        // Afficher une notification de test
-                        new Notification('🚨 Surveillance Digue', {
-                            body: 'Notifications activées ! Vous serez alerté en cas de franchissement de seuil.',
-                            icon: 'icon-192.png',
-                            badge: 'icon-192.png'
-                        });
-                    }
-                });
-            } else if (Notification.permission === 'granted') {
-                notificationsActivees = true;
-            }
-        }
-        
-        // Vérifier les franchissements de seuils et envoyer des notifications
-        function verifierEtNotifierSeuils(station, valeur, seuils, dernierSeuil) {
-            if (!notificationsActivees || Notification.permission !== 'granted') {
-                return dernierSeuil;
-            }
-            
-            var seuilActuel = null;
-            for (var i = 0; i < seuils.length; i++) {
-                if (valeur >= seuils[i].level) {
-                    seuilActuel = seuils[i];
-                }
-            }
-            
-            // Si le seuil a changé (franchissement à la hausse ou à la baisse)
-            if (seuilActuel !== dernierSeuil) {
-                var titre = '';
-                var message = '';
-                
-                if (seuilActuel === null && dernierSeuil !== null) {
-                    // Retour à la normale
-                    titre = '✅ ' + station + ' - Retour à la normale';
-                    message = 'Le niveau d\'eau est repassé sous les seuils d\'alerte (' + (valeur * 100).toFixed(0) + 'cm)';
-                } else if (seuilActuel !== null) {
-                    // Franchissement d'un seuil
-                    var emoji = '⚠️';
-                    if (seuilActuel.color === '#D32F2F') {
-                        emoji = '🚨'; // Seuil critique
-                    } else if (seuilActuel.color === '#FF9800') {
-                        emoji = '⚠️'; // Seuil élevé
-                    } else if (seuilActuel.color === '#F57F17') {
-                        emoji = '🟡'; // Seuil moyen
-                    } else {
-                        emoji = '🟣'; // Seuil bas
-                    }
-                    
-                    titre = emoji + ' ' + station + ' - ' + seuilActuel.name;
-                    message = seuilActuel.description + ' franchi ! Niveau actuel: ' + (valeur * 100).toFixed(0) + 'cm (' + valeur.toFixed(2) + 'm)';
-                }
-                
-                // Envoyer la notification
-                if (titre && message) {
-                    new Notification(titre, {
-                        body: message,
-                        icon: 'icon-192.png',
-                        badge: 'icon-192.png',
-                        vibrate: [200, 100, 200],
-                        requireInteraction: true, // La notification reste jusqu'à ce que l'utilisateur la ferme
-                        tag: station // Remplace les anciennes notifications de la même station
-                    });
-                }
-            }
-            
-            return seuilActuel;
-        }
-        
-        // Modifier la fonction processAPIData pour intégrer les notifications
-        var processAPIDataOriginal = processAPIData;
-        processAPIData = function(rawData) {
-            var result = processAPIDataOriginal(rawData);
-            
-            if (result && chartData.length > 0) {
-                var latest = chartData[0];
-                var activeThreshold = getActiveThreshold(latest.value);
-                dernierSeuilVaulx = verifierEtNotifierSeuils('SE Vaulx-en-Velin', latest.value, thresholds, dernierSeuilVaulx);
-            }
-            
-            return result;
-        };
-        
-        // Créer une version modifiée de processAPIData pour Villeurbanne
-        var processAPIData2Original = processAPIData2;
-        processAPIData2 = function(rawData) {
-            var result = processAPIData2Original(rawData);
-            
-            if (result && chartData2.length > 0) {
-                var latest = chartData2[0];
-                var activeThreshold = getActiveThreshold2(latest.value);
-                dernierSeuilVilleurbanne = verifierEtNotifierSeuils('SE Villeurbanne', latest.value, thresholds2, dernierSeuilVilleurbanne);
-            }
-            
-            return result;
-        };
-        
-        // Vérification périodique des données (toutes les 15 minutes)
-        function demarrerSurveillance() {
-            // Vérifier toutes les 15 minutes (900000 ms)
-            setInterval(function() {
-                console.log('🔄 Vérification automatique des niveaux d\'eau...');
-                loadWaterData();
-                loadWaterData2();
-            }, 900000); // 15 minutes
-        }
-        
-        // Chargement automatique au démarrage
-        setTimeout(function() {
-            loadWaterData();
-            loadWaterData2();
-            // Mettre à jour l'état du bouton
-            mettreAJourBoutonNotifications();
-            // Démarrer la surveillance périodique
-            demarrerSurveillance();
-        }, 1000);
-        
-        // Déverrouiller la rotation d'écran pour PWA installée
-        if ('screen' in window && 'orientation' in window.screen) {
-            // Déverrouiller l'orientation pour permettre la rotation
-            if (window.screen.orientation.unlock) {
-                window.screen.orientation.unlock();
-            }
-            
-            // Permettre toutes les orientations
-            try {
-                if (window.screen.orientation.lock) {
-                    // On ne verrouille pas, on laisse libre
-                    window.screen.orientation.unlock().catch(function(error) {
-                        console.log('Rotation déjà déverrouillée');
-                    });
-                }
-            } catch (error) {
-                console.log('API Screen Orientation non supportée');
-            }
-        }
-        
-        // ========================================
-        // SYSTÈME DE NOTIFICATIONS
-        // ========================================
-        
-        var notificationsEnabled = false;
-        var lastNotifiedThreshold = { vaulx: null, villeurbanne: null };
-        var notificationCheckInterval = null;
-        
-        // Demander la permission pour les notifications
-        function requestNotificationPermission() {
-            if (!('Notification' in window)) {
-                alert('Les notifications ne sont pas supportées par votre navigateur');
-                return Promise.reject('Non supporté');
-            }
-            
-            if (Notification.permission === 'granted') {
-                return Promise.resolve('granted');
-            }
-            
-            if (Notification.permission !== 'denied') {
-                return Notification.requestPermission();
-            }
-            
-            return Promise.reject('denied');
-        }
-        
-        // Envoyer une notification
-        function sendNotification(secteur, threshold) {
-            if (Notification.permission === 'granted' && 'serviceWorker' in navigator) {
-                var title = '🚨 Alerte Surveillance Digue';
-                var body = '⚠️ ' + secteur + ' : ' + threshold.name + ' franchi !\n' +
-                          '💧 Niveau: ' + (threshold.level * 100).toFixed(0) + ' cm\n' +
-                          '📋 ' + threshold.description;
-                
-                // Utiliser le Service Worker pour afficher la notification
-                navigator.serviceWorker.ready.then(function(registration) {
-                    registration.showNotification(title, {
-                        body: body,
-                        icon: 'icon-192.png',
-                        badge: 'icon-192.png',
-                        tag: 'water-alert-' + secteur,
-                        requireInteraction: true,
-                        vibrate: [200, 100, 200, 100, 200],
-                        silent: false,
-                        data: {
-                            secteur: secteur,
-                            threshold: threshold
-                        }
-                    });
-                }).catch(function(error) {
-                    console.error('Erreur notification:', error);
-                });
-            }
-        }
-        
-        // Vérifier les seuils et notifier si nécessaire
-        function checkThresholdsAndNotify() {
-            // Vérifier SE Vaulx-en-Velin
-            if (chartData && chartData.length > 0) {
-                var latest = chartData[0];
-                var activeThreshold = getActiveThreshold(latest.value);
-                
-                if (activeThreshold && activeThreshold !== lastNotifiedThreshold.vaulx) {
-                    sendNotification('SE Vaulx-en-Velin', activeThreshold);
-                    lastNotifiedThreshold.vaulx = activeThreshold;
-                }
-            }
-            
-            // Vérifier SE Villeurbanne
-            if (chartData2 && chartData2.length > 0) {
-                var latest2 = chartData2[0];
-                var activeThreshold2 = getActiveThreshold2(latest2.value);
-                
-                if (activeThreshold2 && activeThreshold2 !== lastNotifiedThreshold.villeurbanne) {
-                    sendNotification('SE Villeurbanne', activeThreshold2);
-                    lastNotifiedThreshold.villeurbanne = activeThreshold2;
-                }
-            }
-        }
-        
-        // Activer/désactiver les notifications
-        function toggleNotifications() {
-            var btn = document.getElementById('notificationBtn');
-            var status = document.getElementById('notificationStatus');
-            
-            if (!notificationsEnabled) {
-                // Activer les notifications
-                requestNotificationPermission().then(function(permission) {
-                    if (permission === 'granted') {
-                        notificationsEnabled = true;
-                        btn.innerHTML = '🔕 Désactiver les notifications';
-                        btn.className = 'btn btn-warning';
-                        status.style.display = 'block';
-                        status.style.background = '#e8f5e8';
-                        status.style.color = '#2e7d32';
-                        status.innerHTML = '✅ Notifications activées - Vérification toutes les 5 minutes';
-                        
-                        // Vérifier toutes les 5 minutes (300000 ms)
-                        notificationCheckInterval = setInterval(function() {
-                            loadWaterData();
-                            loadWaterData2();
-                            setTimeout(checkThresholdsAndNotify, 2000);
-                        }, 300000);
-                        
-                        // Notification de test via Service Worker
-                        navigator.serviceWorker.ready.then(function(registration) {
-                            registration.showNotification('🔔 Notifications activées', {
-                                body: 'Vous recevrez une alerte en cas de franchissement de seuil',
-                                icon: 'icon-192.png',
-                                tag: 'test-notification'
-                            });
-                        });
-                    } else {
-                        status.style.display = 'block';
-                        status.style.background = '#ffebee';
-                        status.style.color = '#c62828';
-                        status.innerHTML = '❌ Permission refusée. Activez les notifications dans les paramètres de votre navigateur.';
-                    }
-                }).catch(function(error) {
-                    status.style.display = 'block';
-                    status.style.background = '#ffebee';
-                    status.style.color = '#c62828';
-                    status.innerHTML = '❌ Erreur: ' + error;
-                });
-            } else {
-                // Désactiver les notifications
-                notificationsEnabled = false;
-                btn.innerHTML = '🔔 Activer les notifications';
-                btn.className = 'btn btn-success';
-                status.style.display = 'block';
-                status.style.background = '#fff3e0';
-                status.style.color = '#e65100';
-                status.innerHTML = 'ℹ️ Notifications désactivées';
-                
-                if (notificationCheckInterval) {
-                    clearInterval(notificationCheckInterval);
-                    notificationCheckInterval = null;
-                }
-            }
-        }
-        
-        // Enregistrement du Service Worker pour PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js')
-                    .then(function(registration) {
-                        console.log('✅ Service Worker enregistré:', registration.scope);
-                    })
-                    .catch(function(error) {
-                        console.log('❌ Erreur Service Worker:', error);
-                    });
-            });
-        }
-    </script>
+var secteurActif=null;
+function showItineraires(secteur){var container=document.getElementById('itinerairesContainer');if(secteurActif===secteur){container.style.opacity='0';setTimeout(function(){container.innerHTML='';container.style.opacity='1';},300);secteurActif=null;return;}secteurActif=secteur;var it={vaulx:[{nom:'Les eaux bleues',url:'https://www.google.com/maps/d/u/2/edit?mid=1xuvjlfYmt7UZRE7ge-LNNPdcJEYxIm4&usp=sharing'},{nom:'Digue Duclos',url:'https://www.google.com/maps/d/u/2/edit?mid=19Q9OWRfZO9Zc9NJInPFjtgtJPzGFfbk&usp=sharing'},{nom:'Digue St Jean',url:'https://www.google.com/maps/d/u/2/edit?mid=1Gr9am_UsQsmUgVEceA6UrlQLQcLhc0E&usp=sharing'},{nom:'A42 – Circuit C',url:'https://www.google.com/maps/d/u/2/edit?mid=1mD_dqfH4oC_-9qsjT1hGWWzekj_4T1Q&usp=sharing'},{nom:'A42 – Circuit D',url:'https://www.google.com/maps/d/u/2/edit?mid=1OjoIxd6LZXW_iMYzVYTb7wRkBMavYzQ&usp=sharing'},{nom:'RN346 – Circuit B',url:'https://www.google.com/maps/d/u/2/edit?mid=1o6Zxd64BSOSE07IeDYvy0Gh-whveLc4&usp=sharing'},{nom:'RN346 – Circuit A',url:'https://www.google.com/maps/d/u/2/edit?mid=1eUp178SU_qUIVpgVqzdEy97UzShjaik&usp=sharing'}],villeurbanne:[{nom:'Laurent Bonnevay',url:'https://www.google.com/maps/d/u/2/edit?mid=1Zxah_iusW28Dr8_OpF6WjlGid1BZ7Qo&usp=sharing'}]};var html='';it[secteur].forEach(function(p,i){var urlV=p.url.replace('/edit?','/viewer?');html+='<a href="'+urlV+'" class="btn btn-action" target="_blank" style="margin-bottom:8px;"><span class="btn-icon">🗺️</span> '+(i+1)+'. '+p.nom+'</a>';});container.style.opacity='0';container.innerHTML=html;setTimeout(function(){container.style.transition='opacity 0.25s';container.style.opacity='1';},50);}
+var secteurCartesActif=null;
+function showCartesInondation(secteur){var container=document.getElementById('cartesInondationContainer');if(secteurCartesActif===secteur){container.style.opacity='0';setTimeout(function(){container.innerHTML='';container.style.opacity='1';},300);secteurCartesActif=null;return;}secteurCartesActif=secteur;var cartes={vaulx:[{nom:'Carte 1 — Vaulx-en-Velin',url:'https://drive.google.com/file/d/139aupDKrJroJonY2-P0Apefs0WAuX87n/view?usp=sharing'},{nom:'Carte 2 — Vaulx-en-Velin',url:'https://drive.google.com/file/d/1yusir_NnZtxbvRH6tBYmkhCY4KaNlno0/view?usp=sharing'},{nom:'Carte 3 — Vaulx-en-Velin',url:'https://drive.google.com/file/d/11ZjqdhuYC0nwuhMxEWyWmOX49PuTSelc/view?usp=sharing'},{nom:'Carte 4 — Vaulx-en-Velin',url:'https://drive.google.com/file/d/1cXbRCTHWeMID3k_LS8zpnNBftejYnRlO/view?usp=sharing'}],villeurbanne:[{nom:'Carte 1 — Villeurbanne',url:'https://drive.google.com/file/d/1wded4yDG601TTAJqpN0I1ekNENAcEJo2/view?usp=sharing'},{nom:'Carte 2 — Villeurbanne',url:'https://drive.google.com/file/d/1yBRJCV8_zKyvvMREIm-lveomHlPErH-G/view?usp=sharing'}]};var html='';cartes[secteur].forEach(function(c,i){html+='<a href="'+c.url+'" class="btn btn-action" target="_blank" style="margin-bottom:8px;"><span class="btn-icon">💧</span> '+(i+1)+'. '+c.nom+'</a>';});container.style.opacity='0';container.innerHTML=html;setTimeout(function(){container.style.transition='opacity 0.25s';container.style.opacity='1';},50);}
+var notificationsEnabled=false,lastNotifiedThreshold={vaulx:null,villeurbanne:null},notificationCheckInterval=null;
+function requestNotificationPermission(){if(!('Notification' in window)){alert('Les notifications ne sont pas supportées par votre navigateur');return Promise.reject('Non supporté');}if(Notification.permission==='granted')return Promise.resolve('granted');if(Notification.permission!=='denied')return Notification.requestPermission();return Promise.reject('denied');}
+function sendNotification(secteur,threshold){if(Notification.permission==='granted'&&'serviceWorker' in navigator){var title='⚠ Alerte Surveillance Digue',body=secteur+' : '+threshold.name+' franchi !\nNiveau : '+(threshold.level*100).toFixed(0)+' cm\n'+threshold.description;navigator.serviceWorker.ready.then(function(reg){reg.showNotification(title,{body:body,icon:'icon-192.png',badge:'icon-192.png',tag:'water-alert-'+secteur,requireInteraction:true,vibrate:[200,100,200,100,200],silent:false,data:{secteur:secteur,threshold:threshold}});}).catch(function(err){console.error('Erreur notification:',err);});}}
+function checkThresholdsAndNotify(){if(chartData&&chartData.length>0){var at=getActiveThreshold(chartData[0].value);if(at&&at!==lastNotifiedThreshold.vaulx){sendNotification('SE Vaulx-en-Velin',at);lastNotifiedThreshold.vaulx=at;}}if(chartData2&&chartData2.length>0){var at2=getActiveThreshold2(chartData2[0].value);if(at2&&at2!==lastNotifiedThreshold.villeurbanne){sendNotification('SE Villeurbanne',at2);lastNotifiedThreshold.villeurbanne=at2;}}}
+function _setNotifUI(enabled,statusClass,statusMsg,btnLabel){var btn=document.getElementById('notificationBtn'),btnTop=document.getElementById('btnNotifications'),status=document.getElementById('notificationStatus');btn.innerHTML='<span class="btn-icon">'+(enabled?'🔕':'🔔')+'</span> '+btnLabel;btn.className=enabled?'btn btn-warning':'btn btn-success';btn.style.width='100%';btn.style.justifyContent='center';btnTop.textContent=enabled?'✔ Activées':'Activer';btnTop.className='notif-toggle-btn'+(enabled?' active':'');status.className='notif-status '+statusClass;status.textContent=statusMsg;status.style.display=statusMsg?'block':'none';}
+function toggleNotifications(){if(!notificationsEnabled){requestNotificationPermission().then(function(perm){if(perm==='granted'){notificationsEnabled=true;_setNotifUI(true,'ok','✔ Notifications activées — Vérification toutes les 5 minutes','Désactiver les notifications');notificationCheckInterval=setInterval(function(){loadWaterData();loadWaterData2();setTimeout(checkThresholdsAndNotify,2000);},300000);navigator.serviceWorker.ready.then(function(reg){reg.showNotification('Notifications activées',{body:'Vous serez alerté en cas de franchissement de seuil.',icon:'icon-192.png',tag:'test-notification'});});}else{_setNotifUI(false,'err','✘ Permission refusée — Activez les notifications dans les paramètres','Activer les notifications');}}).catch(function(err){_setNotifUI(false,'err','✘ Erreur : '+err,'Activer les notifications');});}else{notificationsEnabled=false;_setNotifUI(false,'off','Notifications désactivées','Activer les notifications');if(notificationCheckInterval){clearInterval(notificationCheckInterval);notificationCheckInterval=null;}}}
+var dernierSeuilVaulx=null,dernierSeuilVilleurbanne=null,notificationsActivees=false;
+function verifierEtNotifierSeuils(station,valeur,seuils,dernierSeuil){if(!notificationsActivees&&!notificationsEnabled)return dernierSeuil;if(Notification.permission!=='granted')return dernierSeuil;var seuilActuel=null;seuils.forEach(function(s){if(valeur>=s.level)seuilActuel=s;});if(seuilActuel!==dernierSeuil){var titre='',message='';if(!seuilActuel&&dernierSeuil){titre='✔ '+station+' — Retour à la normale';message='Niveau repassé sous les seuils ('+(valeur*100).toFixed(0)+'cm)';}else if(seuilActuel){titre='⚠ '+station+' — '+seuilActuel.name;message=seuilActuel.description+' franchi ! Niveau : '+(valeur*100).toFixed(0)+'cm';}if(titre)new Notification(titre,{body:message,icon:'icon-192.png',badge:'icon-192.png',vibrate:[200,100,200],requireInteraction:true,tag:station});}return seuilActuel;}
+function demarrerSurveillance(){setInterval(function(){loadWaterData();loadWaterData2();},900000);}
+setTimeout(function(){loadWaterData();loadWaterData2();demarrerSurveillance();if('Notification' in window&&Notification.permission==='granted')notificationsActivees=true;},1000);
+if('screen' in window&&'orientation' in window.screen){try{if(window.screen.orientation.unlock)window.screen.orientation.unlock().catch(function(){});}catch(e){}}
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').then(function(r){console.log('SW enregistré:',r.scope);}).catch(function(e){console.log('SW erreur:',e);});});}
+</script>
 </body>
 </html>
