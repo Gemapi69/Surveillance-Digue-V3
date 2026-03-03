@@ -1,4 +1,4 @@
-const CACHE_NAME = 'surveillance-digue-v15';
+const CACHE_NAME = 'surveillance-digue-v16';
 const urlsToCache = [
   './',
   './index.html',
@@ -40,15 +40,15 @@ self.addEventListener('fetch', function(event) {
             if (!response || response.status !== 200 || response.type === 'error') {
               return response;
             }
-            
+
             // Cloner la réponse car elle ne peut être consommée qu'une seule fois
             var responseToCache = response.clone();
-            
+
             caches.open(CACHE_NAME)
               .then(function(cache) {
                 cache.put(event.request, responseToCache);
               });
-            
+
             return response;
           });
       })
@@ -77,11 +77,12 @@ self.addEventListener('activate', function(event) {
   // Force le nouveau Service Worker à prendre le contrôle immédiatement
   return self.clients.claim();
 });
+
 // Gestion des notifications
 self.addEventListener('notificationclick', function(event) {
   console.log('🔔 Notification cliquée');
   event.notification.close();
-  
+
   // Ouvrir ou focus sur l'application
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true })
